@@ -20,7 +20,7 @@ public class GameLogic : MonoBehaviour
     void Start()
     {
         hasShield = false;
-        SetMaxHealth();
+        playerHealth.SetMaxHealth(100);
         playerHealth.SetHealth(playerHealth.getMaxHealth());
 
         ammoCount = AmmoCapacity;
@@ -32,13 +32,7 @@ public class GameLogic : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        SetMaxHealth();
         UpdateHUDTexts();
-    }
-
-    void SetMaxHealth()
-    {
-        playerHealth.SetMaxHealth(hasShield ? 130 : 100);
     }
 
     void UpdateHUDTexts()
@@ -53,9 +47,10 @@ public class GameLogic : MonoBehaviour
         if (playerHealth.getHealth() > 0)
         {
             float tempHealth = playerHealth.getHealth() - damagePoints;
-            if (tempHealth < 0) {
+            if (tempHealth < 0)
+            {
                 tempHealth = 0;
-            } 
+            }
             playerHealth.SetHealth(tempHealth);
         }
     }
@@ -63,18 +58,37 @@ public class GameLogic : MonoBehaviour
     // Testing functions
     public void ToggleShield()
     {
-        float currHealth = playerHealth.getHealth();
-        float newHealth;
-        if (hasShield) {
-            // -30 Assuming no damage
-            newHealth = currHealth - 30;
-            shieldCount--;
-        } else {
-            newHealth = currHealth + 30;
+        if (shieldCount > 0)
+        {
+            if (hasShield == true)
+            {
+                DeactivateShield();
+            }
+            else
+            {
+                ActivateShield();
+            }
         }
-        // float newHealth = hasShield ? currHealth - 30 : currHealth + 30;
+    }
+
+    void ActivateShield()
+    {
+        hasShield = true;
+        playerHealth.SetMaxHealth(130);
+        float currHealth = playerHealth.getHealth();
+        float newHealth = currHealth + 30;
         playerHealth.SetHealth(newHealth);
-        hasShield = !hasShield;
+        shieldCount--;
+    }
+
+    void DeactivateShield()
+    {
+        hasShield = false;
+        playerHealth.SetMaxHealth(100);
+        // Assuming no damage
+        float currHealth = playerHealth.getHealth();
+        float newHealth = currHealth - 30;
+        playerHealth.SetHealth(newHealth);
     }
 
     public void DealBulletDamage()
