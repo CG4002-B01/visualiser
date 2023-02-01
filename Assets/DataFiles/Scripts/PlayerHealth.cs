@@ -9,31 +9,41 @@ public class PlayerHealth : MonoBehaviour
     public TextMeshProUGUI HealthText;
     public Image[] HealthPoints;
     public Image[] ShieldPoints; 
-    bool hasShield; 
     float health, maxHealth;
     // Start is called before the first frame update
     void Start()
     {
-        hasShield = false;
-        SetMaxHealth();
-        health = maxHealth;
+        
     }
 
     // Update is called once per frame
     void Update()
     {
-        SetMaxHealth();
         HealthText.text = health + "/" + maxHealth;
         if (health > maxHealth) {
             health = maxHealth;
         }
-
         HealthBarFiller();
     }
 
-    void SetMaxHealth()
+    public void SetHealth(float _health) 
     {
-        maxHealth = hasShield ? 130 : 100;
+        health = _health;
+    }
+
+    public void SetMaxHealth(float _maxHealth) 
+    {
+        maxHealth = _maxHealth;
+    }
+
+    public float getHealth() 
+    {
+        return health;
+    }
+
+    public float getMaxHealth()
+    {
+        return maxHealth;
     }
 
     void HealthBarFiller() 
@@ -48,29 +58,4 @@ public class PlayerHealth : MonoBehaviour
         return ((pointNumber * 10) >= _health);
     }
 
-    public void Damage(float damagePoints) 
-    {
-        if (health > 0) {
-            health = health - damagePoints;
-        }
-    }
-
-    // Testing functions
-    public void ToggleShield() {
-        health = hasShield ? health : health + 30; 
-        hasShield = !hasShield;
-    }
-
-    public void DealBulletDamage() {
-        Damage(10);
-    }
-
-    public void DealGrenadeDamage() {
-        Damage(30);
-    }
-
-    public void ResetHealth() {
-        maxHealth = 100;
-        health = maxHealth;
-    }
 }
