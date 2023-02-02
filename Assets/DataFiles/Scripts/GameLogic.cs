@@ -14,6 +14,7 @@ public class GameLogic : MonoBehaviour
     bool hasShield;
     int deathCount;
     int killCount;
+    bool hasDied;
     public PlayerHealth playerHealth;
     public HUDText hudTexts;
     // Start is called before the first frame update
@@ -27,11 +28,14 @@ public class GameLogic : MonoBehaviour
         grenadeCount = GrenadeCapacity;
         shieldCount = ShieldCapacity;
         shieldTimer = 10;
+        deathCount = 0;
+        killCount = 0;
     }
 
     // Update is called once per frame
     void Update()
     {
+        updateDeaths();
         UpdateHUDTexts();
     }
 
@@ -40,6 +44,8 @@ public class GameLogic : MonoBehaviour
         hudTexts.SetAmmoText(ammoCount + "/" + AmmoCapacity);
         hudTexts.SetGrenadeText(grenadeCount + "/" + GrenadeCapacity);
         hudTexts.SetShieldText(shieldCount + "/" + ShieldCapacity);
+        hudTexts.SetKillCount(killCount.ToString());
+        hudTexts.SetDeathCount(deathCount.ToString());
     }
 
     public void Damage(float damagePoints)
@@ -119,7 +125,7 @@ public class GameLogic : MonoBehaviour
 
     public void ReloadAmmo()
     {
-        if (ammoCount == 0)
+        if (ammoCount == 0 || hasDied)
         {
             ammoCount = AmmoCapacity;
         }
@@ -127,7 +133,7 @@ public class GameLogic : MonoBehaviour
 
     public void ReloadGrenade()
     {
-        if (grenadeCount == 0)
+        if (grenadeCount == 0 || hasDied)
         {
             grenadeCount = GrenadeCapacity;
         }
@@ -136,5 +142,25 @@ public class GameLogic : MonoBehaviour
     public void ResetShieldCount()
     {
         shieldCount = ShieldCapacity;
+    }
+
+    void updateKills() 
+    {
+        // If player hasn't died
+        killCount++;
+    }
+
+    void updateDeaths()
+    {
+        if (playerHealth.getHealth() <= 0) {
+            hasDied = true;
+            deathCount++;
+            // Respawn timer here? 
+            ResetShieldCount();
+            ReloadAmmo();
+            ReloadGrenade();
+            ResetHealth();
+        }
+        hasDied = false;
     }
 }

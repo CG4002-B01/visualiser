@@ -10,6 +10,8 @@ public class HUDText : MonoBehaviour
     [SerializeField] TextMeshProUGUI GrenadeText; 
     // [SerializeField] TextMeshProUGUI ShieldTimer;
     [SerializeField] TextMeshProUGUI ShieldTimerText;
+    [SerializeField] TextMeshProUGUI DeathCountText;
+    [SerializeField] TextMeshProUGUI KillCountText;
     // Start is called before the first frame update
     void Start()
     {
@@ -40,5 +42,15 @@ public class HUDText : MonoBehaviour
     public void SetAmmoText(string text)
     {
         AmmoText.text = text;
+    }
+
+    public void SetDeathCount(string text)
+    {
+        DeathCountText.text = text;
+    }
+
+    public void SetKillCount(string text)
+    {
+        KillCountText.text = text;
     }
 }
