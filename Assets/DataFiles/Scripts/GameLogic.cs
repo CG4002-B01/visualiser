@@ -9,14 +9,15 @@ public class GameLogic : MonoBehaviour
     const int GrenadeCapacity = 2;
     int grenadeCount;
     const int ShieldCapacity = 3;
-    int shieldTimer = 10;
     int shieldCount;
+    float shieldDamageCount;
     bool hasShield;
     int deathCount;
     int killCount;
     bool hasDied;
     public PlayerHealth playerHealth;
     public HUDText hudTexts;
+    public Timer shieldTimerObj; 
     // Start is called before the first frame update
     void Start()
     {
@@ -27,7 +28,7 @@ public class GameLogic : MonoBehaviour
         ammoCount = AmmoCapacity;
         grenadeCount = GrenadeCapacity;
         shieldCount = ShieldCapacity;
-        shieldTimer = 10;
+        shieldDamageCount = 0;
         deathCount = 0;
         killCount = 0;
     }
@@ -46,6 +47,7 @@ public class GameLogic : MonoBehaviour
         hudTexts.SetShieldText(shieldCount + "/" + ShieldCapacity);
         hudTexts.SetKillCount(killCount.ToString());
         hudTexts.SetDeathCount(deathCount.ToString());
+        hudTexts.SetShieldTimerText(shieldTimerObj.GetTime().ToString("0"));
     }
 
     public void Damage(float damagePoints)
@@ -58,6 +60,10 @@ public class GameLogic : MonoBehaviour
                 tempHealth = 0;
             }
             playerHealth.SetHealth(tempHealth);
+        }
+        if (hasShield)
+        {
+            shieldDamageCount += damagePoints;
         }
     }
 
@@ -80,6 +86,8 @@ public class GameLogic : MonoBehaviour
     void ActivateShield()
     {
         hasShield = true;
+        shieldTimerObj.SetStartTimer(true);
+        hudTexts.ToggleTimerText(true);
         playerHealth.SetMaxHealth(130);
         float currHealth = playerHealth.getHealth();
         float newHealth = currHealth + 30;
@@ -90,10 +98,21 @@ public class GameLogic : MonoBehaviour
     void DeactivateShield()
     {
         hasShield = false;
+        shieldTimerObj.SetStartTimer(false);
+        hudTexts.ToggleTimerText(false);
         playerHealth.SetMaxHealth(100);
         // Assuming no damage
         float currHealth = playerHealth.getHealth();
-        float newHealth = currHealth - 30;
+        float newHealth;
+
+        if (shieldDamageCount < 30)
+        {
+            newHealth = currHealth - 30;
+        }
+        else
+        {
+            newHealth = currHealth;
+        }
         playerHealth.SetHealth(newHealth);
     }
 
@@ -144,15 +163,19 @@ public class GameLogic : MonoBehaviour
         shieldCount = ShieldCapacity;
     }
 
-    void updateKills() 
+    void updateKills()
     {
         // If player hasn't died
-        killCount++;
+        if (!hasDied)
+        {
+            killCount++;
+        }
     }
 
     void updateDeaths()
     {
-        if (playerHealth.getHealth() <= 0) {
+        if (playerHealth.getHealth() <= 0)
+        {
             hasDied = true;
             deathCount++;
             // Respawn timer here? 

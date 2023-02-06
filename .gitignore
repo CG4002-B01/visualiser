@@ -144,3 +144,5 @@ PackageBackups/
 
 # UWP builds
 /UWP/*
+
+*.crdownload

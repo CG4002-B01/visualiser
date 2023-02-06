@@ -10,12 +10,14 @@ public class HUDText : MonoBehaviour
     [SerializeField] TextMeshProUGUI GrenadeText; 
     // [SerializeField] TextMeshProUGUI ShieldTimer;
     [SerializeField] TextMeshProUGUI ShieldTimerText;
+    [SerializeField] GameObject TimerDisplay;
+    [SerializeField] TextMeshProUGUI TimerText;
     [SerializeField] TextMeshProUGUI DeathCountText;
     [SerializeField] TextMeshProUGUI KillCountText;
     // Start is called before the first frame update
     void Start()
     {
-        
+        TimerDisplay.SetActive(false);
     }
 
     // Update is called once per frame
@@ -52,5 +54,10 @@ public class HUDText : MonoBehaviour
     public void SetKillCount(string text)
     {
         KillCountText.text = text;
+    }
+
+    public void ToggleTimerText(bool status)
+    {
+        TimerDisplay.SetActive(status);
     }
 }

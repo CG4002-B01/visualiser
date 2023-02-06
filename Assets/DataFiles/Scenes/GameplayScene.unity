@@ -3908,6 +3908,7 @@ GameObject:
   - component: {fileID: 1712579698}
   - component: {fileID: 1712579697}
   - component: {fileID: 1712579699}
+  - component: {fileID: 1712579700}
   m_Layer: 0
   m_Name: GameManager
   m_TagString: Untagged
@@ -3975,6 +3976,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   playerHealth: {fileID: 1712579697}
   hudTexts: {fileID: 1712579699}
+  shieldTimerObj: {fileID: 1712579700}
 --- !u!114 &1712579699
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -3991,8 +3993,22 @@ MonoBehaviour:
   AmmoText: {fileID: 2142478699}
   GrenadeText: {fileID: 1806924182}
   ShieldTimerText: {fileID: 861574723}
+  TimerDisplay: {fileID: 981129016}
+  TimerText: {fileID: 861574723}
   DeathCountText: {fileID: 138461416}
   KillCountText: {fileID: 2064806824}
+--- !u!114 &1712579700
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1712579694}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e54862b1ee3c53345ad512a72a7bd4df, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &1747264209
 GameObject:
   m_ObjectHideFlags: 0
