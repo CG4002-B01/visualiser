@@ -18,6 +18,7 @@ public class GameLogic : MonoBehaviour
     public PlayerHealth playerHealth;
     public HUDText hudTexts;
     public Timer shieldTimerObj; 
+    public GrenadeThrower grenadeThrower;
     // Start is called before the first frame update
     void Start()
     {
@@ -131,6 +132,7 @@ public class GameLogic : MonoBehaviour
         float currHealth = playerHealth.getHealth();
         if (grenadeCount > 0 && currHealth > 0)
         {
+            grenadeThrower.ThrowGrenade();
             Damage(30);
             grenadeCount--;
         }
