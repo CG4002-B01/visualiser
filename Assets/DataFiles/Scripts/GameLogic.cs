@@ -15,9 +15,11 @@ public class GameLogic : MonoBehaviour
     int deathCount;
     int killCount;
     bool hasDied;
+    bool enemyDied;
     public PlayerHealth playerHealth;
+    public EnemyHealth enemyHealth;
     public HUDText hudTexts;
-    public Timer shieldTimerObj; 
+    public Timer shieldTimerObj;
     public GrenadeThrower grenadeThrower;
     // Start is called before the first frame update
     void Start()
@@ -25,6 +27,8 @@ public class GameLogic : MonoBehaviour
         hasShield = false;
         playerHealth.SetMaxHealth(100);
         playerHealth.SetHealth(playerHealth.getMaxHealth());
+        enemyHealth.SetEnemyHealth(100);
+        enemyHealth.SetMaxHealth(100);
 
         ammoCount = AmmoCapacity;
         grenadeCount = GrenadeCapacity;
@@ -38,6 +42,7 @@ public class GameLogic : MonoBehaviour
     void Update()
     {
         updateDeaths();
+        updateKills();
         UpdateHUDTexts();
     }
 
@@ -53,6 +58,7 @@ public class GameLogic : MonoBehaviour
 
     public void Damage(float damagePoints)
     {
+        // For P1
         if (playerHealth.getHealth() > 0)
         {
             float tempHealth = playerHealth.getHealth() - damagePoints;
@@ -65,6 +71,16 @@ public class GameLogic : MonoBehaviour
         if (hasShield)
         {
             shieldDamageCount += damagePoints;
+        }
+        // For P2
+        if (enemyHealth.getHealth() > 0)
+        {
+            float tempEnemyHealth = enemyHealth.getHealth() - damagePoints;
+            if (tempEnemyHealth < 0)
+            {
+                tempEnemyHealth = 0;
+            }
+            enemyHealth.SetEnemyHealth(tempEnemyHealth);
         }
     }
 
@@ -140,8 +156,20 @@ public class GameLogic : MonoBehaviour
 
     public void ResetHealth()
     {
+        // ResetEnemyHealth();
+        ResetPlayerHealth();
+    }
+
+    void ResetPlayerHealth()
+    {
         playerHealth.SetMaxHealth(100);
         playerHealth.SetHealth(playerHealth.getMaxHealth());
+    }
+
+    void ResetEnemyHealth()
+    {
+        enemyHealth.SetMaxHealth(100);
+        enemyHealth.SetEnemyHealth(enemyHealth.getMaxHealth());
     }
 
     public void ReloadAmmo()
@@ -168,10 +196,16 @@ public class GameLogic : MonoBehaviour
     void updateKills()
     {
         // If player hasn't died
-        if (!hasDied)
+        // if (!hasDied)
+        // {
+        if (enemyHealth.getHealth() <= 0 && !enemyDied)
         {
+            enemyDied = true;
             killCount++;
+            ResetEnemyHealth();
         }
+        enemyDied = false;
+        // }
     }
 
     void updateDeaths()
