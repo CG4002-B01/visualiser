@@ -16,8 +16,10 @@ public class GameLogic : MonoBehaviour
     int killCount;
     bool hasDied;
     bool enemyDied;
+    bool enemyVisible;
     public PlayerHealth playerHealth;
     public EnemyHealth enemyHealth;
+    public GameObject enemyHealthbarCanvas;
     public HUDText hudTexts;
     public Timer shieldTimerObj;
     public GrenadeThrower grenadeThrower;
@@ -221,5 +223,20 @@ public class GameLogic : MonoBehaviour
             ResetHealth();
         }
         hasDied = false;
+    }
+
+    public void showEnemyHealthBar()
+    {
+        // Do something
+        enemyHealthbarCanvas.SetActive(true);
+        enemyVisible = true;
+        Debug.Log(enemyVisible);
+    }
+
+    public void hideEnemyHealthBar()
+    {
+        enemyHealthbarCanvas.SetActive(false);
+        enemyVisible = false;
+        Debug.Log(enemyVisible);
     }
 }

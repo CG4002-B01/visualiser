@@ -21,8 +21,10 @@ public class GrenadeThrower : MonoBehaviour
 
     public void ThrowGrenade()
     {
-        GameObject grenade = Instantiate(grenadePrefab, playerPOV.transform.position, playerPOV.transform.rotation);
+        Vector3 newPosition = playerPOV.transform.position + new Vector3(0, 10f, 0);
+        GameObject grenade = Instantiate(grenadePrefab, newPosition, playerPOV.transform.rotation);
         Rigidbody rb = grenade.GetComponent<Rigidbody>();
         rb.AddForce(playerPOV.transform.forward * throwForce, ForceMode.VelocityChange);
+        // rb.AddForce(playerPOV.transform.up * throwForce, ForceMode.VelocityChange);
     }
 }
