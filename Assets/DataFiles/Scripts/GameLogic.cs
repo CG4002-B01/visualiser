@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using System;
 using UnityEngine;
 
 public class GameLogic : MonoBehaviour
@@ -12,6 +13,8 @@ public class GameLogic : MonoBehaviour
     int shieldCount;
     float shieldDamageCount;
     bool hasShield;
+    bool enemyHasShield;
+    public GameObject enemyShield;
     int deathCount;
     int killCount;
     bool hasDied;
@@ -46,6 +49,7 @@ public class GameLogic : MonoBehaviour
         updateDeaths();
         updateKills();
         UpdateHUDTexts();
+        ShieldTimerCheck();
     }
 
     void UpdateHUDTexts()
@@ -86,6 +90,14 @@ public class GameLogic : MonoBehaviour
         }
     }
 
+    void ShieldTimerCheck()
+    {
+        if (Math.Floor(shieldTimerObj.GetTime()) <= 0)
+        {
+            DeactivateShield();
+        }
+    }
+
     // Testing functions
     public void ToggleShield()
     {
@@ -104,6 +116,10 @@ public class GameLogic : MonoBehaviour
 
     void ActivateShield()
     {
+        // Testing Rendering of enemy Shield
+        enemyHasShield = true;
+        enemyShield.SetActive(true);
+
         hasShield = true;
         shieldTimerObj.SetStartTimer(true);
         hudTexts.ToggleTimerText(true);
@@ -116,6 +132,10 @@ public class GameLogic : MonoBehaviour
 
     void DeactivateShield()
     {
+        // Testing Rendering of enemy Shield
+        enemyHasShield = false;
+        enemyShield.SetActive(false);
+        
         hasShield = false;
         shieldTimerObj.SetStartTimer(false);
         hudTexts.ToggleTimerText(false);
@@ -227,16 +247,13 @@ public class GameLogic : MonoBehaviour
 
     public void showEnemyHealthBar()
     {
-        // Do something
         enemyHealthbarCanvas.SetActive(true);
         enemyVisible = true;
-        Debug.Log(enemyVisible);
     }
 
     public void hideEnemyHealthBar()
     {
         enemyHealthbarCanvas.SetActive(false);
         enemyVisible = false;
-        Debug.Log(enemyVisible);
     }
 }
