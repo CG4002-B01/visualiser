@@ -25,6 +25,8 @@ public class GameLogic : MonoBehaviour
     public GameObject enemyHealthbarCanvas;
     public HUDText hudTexts;
     public Timer shieldTimerObj;
+    public GameObject shieldScreen;
+    public GameObject damageScreen;
     public GrenadeThrower grenadeThrower;
     // Start is called before the first frame update
     void Start()
@@ -34,6 +36,8 @@ public class GameLogic : MonoBehaviour
         playerHealth.SetHealth(playerHealth.getMaxHealth());
         enemyHealth.SetEnemyHealth(100);
         enemyHealth.SetMaxHealth(100);
+        shieldScreen.SetActive(false);
+        damageScreen.SetActive(false);
 
         ammoCount = AmmoCapacity;
         grenadeCount = GrenadeCapacity;
@@ -121,6 +125,7 @@ public class GameLogic : MonoBehaviour
         enemyShield.SetActive(true);
 
         hasShield = true;
+        shieldScreen.SetActive(true);
         shieldTimerObj.SetStartTimer(true);
         hudTexts.ToggleTimerText(true);
         playerHealth.SetMaxHealth(130);
@@ -135,8 +140,9 @@ public class GameLogic : MonoBehaviour
         // Testing Rendering of enemy Shield
         enemyHasShield = false;
         enemyShield.SetActive(false);
-        
+
         hasShield = false;
+        shieldScreen.SetActive(false);
         shieldTimerObj.SetStartTimer(false);
         hudTexts.ToggleTimerText(false);
         playerHealth.SetMaxHealth(100);
