@@ -150,7 +150,7 @@ public class GameLogic : MonoBehaviour
         float currHealth = playerHealth.getHealth();
         if (grenadeCount > 0 && currHealth > 0)
         {
-            // grenadeThrower.ThrowGrenade();
+            grenadeThrower.ThrowGrenade();
             Damage(30);
             grenadeCount--;
         }
