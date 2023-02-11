@@ -254,6 +254,14 @@ public class GameLogic : MonoBehaviour
     public void showEnemyHealthBar()
     {
         enemyHealthbarCanvas.SetActive(true);
+        if (enemyHasShield)
+        {
+            enemyShield.SetActive(true);
+        }
+        else
+        {
+            enemyShield.SetActive(false);
+        }
         enemyVisible = true;
     }
 
