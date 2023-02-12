@@ -18,6 +18,7 @@ public class GameLogic : MonoBehaviour
     int deathCount;
     int killCount;
     bool hasDied;
+    bool receivedDamage;
     bool enemyDied;
     bool enemyVisible;
     public PlayerHealth playerHealth;
@@ -54,6 +55,7 @@ public class GameLogic : MonoBehaviour
         updateKills();
         UpdateHUDTexts();
         ShieldTimerCheck();
+        checkReceivedDamage();
     }
 
     void UpdateHUDTexts()
@@ -69,8 +71,13 @@ public class GameLogic : MonoBehaviour
     public void Damage(float damagePoints)
     {
         // For P1
+        if (hasShield)
+        {
+            shieldDamageCount += damagePoints;
+        }
         if (playerHealth.getHealth() > 0)
         {
+            receivedDamage = true;
             float tempHealth = playerHealth.getHealth() - damagePoints;
             if (tempHealth < 0)
             {
@@ -78,10 +85,7 @@ public class GameLogic : MonoBehaviour
             }
             playerHealth.SetHealth(tempHealth);
         }
-        if (hasShield)
-        {
-            shieldDamageCount += damagePoints;
-        }
+
         // For P2
         if (enemyHealth.getHealth() > 0)
         {
@@ -92,6 +96,26 @@ public class GameLogic : MonoBehaviour
             }
             enemyHealth.SetEnemyHealth(tempEnemyHealth);
         }
+    }
+
+    void checkReceivedDamage()
+    {
+        if(receivedDamage && !hasShield) 
+        {
+            activateDamageScreen();
+            Invoke("deactivateDamageScreen", 0.5f);
+            receivedDamage = false;
+        }
+    }
+
+    void activateDamageScreen()
+    {
+        damageScreen.SetActive(true);
+    }
+
+    void deactivateDamageScreen()
+    {
+        damageScreen.SetActive(false);
     }
 
     void ShieldTimerCheck()
