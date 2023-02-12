@@ -299,4 +299,9 @@ public class GameLogic : MonoBehaviour
         enemyHealthbarCanvas.SetActive(false);
         enemyVisible = false;
     }
+
+    public bool getEnemyVisible()
+    {
+        return enemyVisible;
+    }
 }
