@@ -28,6 +28,7 @@ public class GameLogic : MonoBehaviour
     public Timer shieldTimerObj;
     public GameObject shieldScreen;
     public GameObject damageScreen;
+    public GameObject reloadScreen;
     public GrenadeThrower grenadeThrower;
     // Start is called before the first frame update
     void Start()
@@ -39,6 +40,7 @@ public class GameLogic : MonoBehaviour
         enemyHealth.SetMaxHealth(100);
         shieldScreen.SetActive(false);
         damageScreen.SetActive(false);
+        reloadScreen.SetActive(false);
 
         ammoCount = AmmoCapacity;
         grenadeCount = GrenadeCapacity;
@@ -231,10 +233,31 @@ public class GameLogic : MonoBehaviour
 
     public void ReloadAmmo()
     {
-        if (ammoCount == 0 || hasDied)
+        if (hasDied)
         {
-            ammoCount = AmmoCapacity;
+            ResetAmmoCapacity();
         }
+        if (ammoCount == 0 && !hasDied)
+        {
+            ShowReloadAnimation();
+            Invoke("HideReloadAnimation", 0.5f);
+            Invoke("ResetAmmoCapacity", 0.5f);
+        }
+    }
+
+    void ResetAmmoCapacity()
+    {
+        ammoCount = AmmoCapacity;
+    }
+
+    void ShowReloadAnimation()
+    {
+        reloadScreen.SetActive(true);
+    }
+
+    void HideReloadAnimation()
+    {
+        reloadScreen.SetActive(false);
     }
 
     public void ReloadGrenade()
