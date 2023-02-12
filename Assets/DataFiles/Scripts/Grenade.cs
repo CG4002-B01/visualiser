@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class Grenade : MonoBehaviour
 {
-    public float delay = 3f;
+    public float delay = 1f;
     public float radius = 5f;
     public float force = 700f;
     public GameObject ExplosionEffect;

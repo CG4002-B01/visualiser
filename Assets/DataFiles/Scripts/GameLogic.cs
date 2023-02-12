@@ -177,9 +177,14 @@ public class GameLogic : MonoBehaviour
         if (grenadeCount > 0 && currHealth > 0)
         {
             grenadeThrower.ThrowGrenade();
-            Damage(30);
+            Invoke("GrenadeDamage", 2.5f);
             grenadeCount--;
         }
+    }
+
+    void GrenadeDamage()
+    {
+        Damage(30);
     }
 
     public void ResetHealth()
