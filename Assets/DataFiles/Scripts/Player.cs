@@ -10,6 +10,7 @@ public class Player : MonoBehaviour
     float shieldDamageCount;
     const int ShieldCapacity = 3;
     bool hasShield;
+    bool onCooldown;
     const int AmmoCapacity = 6;
     int ammoCount;
     const int GrenadeCapacity = 2;
@@ -26,6 +27,7 @@ public class Player : MonoBehaviour
     void Start()
     {
         hasShield = false;
+        onCooldown = false;
         shieldScreen.SetActive(false);
         playerHealth.SetMaxHealth(100);
         playerHealth.SetHealth(playerHealth.getMaxHealth());
@@ -77,15 +79,23 @@ public class Player : MonoBehaviour
 
     void ShieldTimerCheck()
     {
-        if (Math.Floor(shieldTimerObj.GetTime()) <= 0)
+        if (shieldDamageCount > 30 && hasShield)
         {
             DeactivateShield();
+        }
+        if (Math.Floor(shieldTimerObj.GetTime()) <= 0)
+        {
+            if (hasShield) DeactivateShield();
+            onCooldown = false;
+            shieldTimerObj.SetStartTimer(false);
+            hudTexts.ToggleTimerText(false);
         }
     }
 
     void ActivateShield()
     {
         hasShield = true;
+        onCooldown = true;
         shieldScreen.SetActive(true);
         shieldTimerObj.SetStartTimer(true);
         hudTexts.ToggleTimerText(true);
@@ -100,8 +110,8 @@ public class Player : MonoBehaviour
     {
         hasShield = false;
         shieldScreen.SetActive(false);
-        shieldTimerObj.SetStartTimer(false);
-        hudTexts.ToggleTimerText(false);
+        // shieldTimerObj.SetStartTimer(false);
+        // hudTexts.ToggleTimerText(false);
         playerHealth.SetMaxHealth(100);
         // Assuming no damage
         float currHealth = playerHealth.getHealth();
@@ -116,6 +126,7 @@ public class Player : MonoBehaviour
             newHealth = currHealth;
         }
         playerHealth.SetHealth(newHealth);
+        shieldDamageCount = 0;
     }
 
     void ShowReloadAnimation()
@@ -176,7 +187,9 @@ public class Player : MonoBehaviour
             }
             else
             {
-                ActivateShield();
+                if (onCooldown) Debug.Log("Cooldown period");
+                if (!onCooldown) ActivateShield();
+                // if (shieldTimerObj.GetTime() == 10) ActivateShield();
             }
         }
     }
