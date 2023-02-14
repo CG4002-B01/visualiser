@@ -5,47 +5,18 @@ using UnityEngine;
 
 public class GameLogic : MonoBehaviour
 {
-    const int AmmoCapacity = 6;
-    int ammoCount;
-    const int GrenadeCapacity = 2;
-    int grenadeCount;
-    const int ShieldCapacity = 3;
-    int shieldCount;
-    float shieldDamageCount;
-    bool hasShield;
-    bool enemyHasShield;
     public GameObject enemyShield;
+    public GameObject enemyHealthbarCanvas;
+    bool enemyVisible;
     int deathCount;
     int killCount;
-    bool hasDied;
-    bool receivedDamage;
-    bool enemyDied;
-    bool enemyVisible;
-    public PlayerHealth playerHealth;
-    public EnemyHealth enemyHealth;
-    public GameObject enemyHealthbarCanvas;
+    public Player player;
+    public Opponent opponent;
     public HUDText hudTexts;
-    public Timer shieldTimerObj;
-    public GameObject shieldScreen;
-    public GameObject damageScreen;
-    public GameObject reloadScreen;
     public GrenadeThrower grenadeThrower;
     // Start is called before the first frame update
     void Start()
     {
-        hasShield = false;
-        playerHealth.SetMaxHealth(100);
-        playerHealth.SetHealth(playerHealth.getMaxHealth());
-        enemyHealth.SetEnemyHealth(100);
-        enemyHealth.SetMaxHealth(100);
-        shieldScreen.SetActive(false);
-        damageScreen.SetActive(false);
-        reloadScreen.SetActive(false);
-
-        ammoCount = AmmoCapacity;
-        grenadeCount = GrenadeCapacity;
-        shieldCount = ShieldCapacity;
-        shieldDamageCount = 0;
         deathCount = 0;
         killCount = 0;
     }
@@ -56,257 +27,41 @@ public class GameLogic : MonoBehaviour
         updateDeaths();
         updateKills();
         UpdateHUDTexts();
-        ShieldTimerCheck();
-        checkReceivedDamage();
     }
 
     void UpdateHUDTexts()
     {
-        hudTexts.SetAmmoText(ammoCount + "/" + AmmoCapacity);
-        hudTexts.SetGrenadeText(grenadeCount + "/" + GrenadeCapacity);
-        hudTexts.SetShieldText(shieldCount + "/" + ShieldCapacity);
         hudTexts.SetKillCount(killCount.ToString());
         hudTexts.SetDeathCount(deathCount.ToString());
-        hudTexts.SetShieldTimerText(shieldTimerObj.GetTime().ToString("0"));
-    }
-
-    public void Damage(float damagePoints)
-    {
-        // For P1
-        if (hasShield)
-        {
-            shieldDamageCount += damagePoints;
-        }
-        if (playerHealth.getHealth() > 0)
-        {
-            receivedDamage = true;
-            float tempHealth = playerHealth.getHealth() - damagePoints;
-            if (tempHealth < 0)
-            {
-                tempHealth = 0;
-            }
-            playerHealth.SetHealth(tempHealth);
-        }
-
-        // For P2
-        if (enemyHealth.getHealth() > 0)
-        {
-            float tempEnemyHealth = enemyHealth.getHealth() - damagePoints;
-            if (tempEnemyHealth < 0)
-            {
-                tempEnemyHealth = 0;
-            }
-            enemyHealth.SetEnemyHealth(tempEnemyHealth);
-        }
-    }
-
-    void checkReceivedDamage()
-    {
-        if(receivedDamage && !hasShield) 
-        {
-            activateDamageScreen();
-            Invoke("deactivateDamageScreen", 0.5f);
-            receivedDamage = false;
-        }
-    }
-
-    void activateDamageScreen()
-    {
-        damageScreen.SetActive(true);
-    }
-
-    void deactivateDamageScreen()
-    {
-        damageScreen.SetActive(false);
-    }
-
-    void ShieldTimerCheck()
-    {
-        if (Math.Floor(shieldTimerObj.GetTime()) <= 0)
-        {
-            DeactivateShield();
-        }
-    }
-
-    // Testing functions
-    public void ToggleShield()
-    {
-        if (shieldCount > 0)
-        {
-            if (hasShield == true)
-            {
-                DeactivateShield();
-            }
-            else
-            {
-                ActivateShield();
-            }
-        }
-    }
-
-    void ActivateShield()
-    {
-        // Testing Rendering of enemy Shield
-        enemyHasShield = true;
-        enemyShield.SetActive(true);
-
-        hasShield = true;
-        shieldScreen.SetActive(true);
-        shieldTimerObj.SetStartTimer(true);
-        hudTexts.ToggleTimerText(true);
-        playerHealth.SetMaxHealth(130);
-        float currHealth = playerHealth.getHealth();
-        float newHealth = currHealth + 30;
-        playerHealth.SetHealth(newHealth);
-        shieldCount--;
-    }
-
-    void DeactivateShield()
-    {
-        // Testing Rendering of enemy Shield
-        enemyHasShield = false;
-        enemyShield.SetActive(false);
-
-        hasShield = false;
-        shieldScreen.SetActive(false);
-        shieldTimerObj.SetStartTimer(false);
-        hudTexts.ToggleTimerText(false);
-        playerHealth.SetMaxHealth(100);
-        // Assuming no damage
-        float currHealth = playerHealth.getHealth();
-        float newHealth;
-
-        if (shieldDamageCount < 30)
-        {
-            newHealth = currHealth - 30;
-        }
-        else
-        {
-            newHealth = currHealth;
-        }
-        playerHealth.SetHealth(newHealth);
-    }
-
-    public void DealBulletDamage()
-    {
-        float currHealth = playerHealth.getHealth();
-        if (ammoCount > 0 && currHealth > 0)
-        {
-            Damage(10);
-            ammoCount--;
-        }
-    }
-
-    public void DealGrenadeDamage()
-    {
-        float currHealth = playerHealth.getHealth();
-        if (grenadeCount > 0 && currHealth > 0)
-        {
-            grenadeThrower.ThrowGrenade();
-            Invoke("GrenadeDamage", 2.5f);
-            grenadeCount--;
-        }
-    }
-
-    void GrenadeDamage()
-    {
-        Damage(30);
-    }
-
-    public void ResetHealth()
-    {
-        // ResetEnemyHealth();
-        ResetPlayerHealth();
-    }
-
-    void ResetPlayerHealth()
-    {
-        playerHealth.SetMaxHealth(100);
-        playerHealth.SetHealth(playerHealth.getMaxHealth());
-    }
-
-    void ResetEnemyHealth()
-    {
-        enemyHealth.SetMaxHealth(100);
-        enemyHealth.SetEnemyHealth(enemyHealth.getMaxHealth());
-    }
-
-    public void ReloadAmmo()
-    {
-        if (hasDied)
-        {
-            ResetAmmoCapacity();
-        }
-        if (ammoCount == 0 && !hasDied)
-        {
-            ShowReloadAnimation();
-            Invoke("HideReloadAnimation", 0.5f);
-            Invoke("ResetAmmoCapacity", 0.5f);
-        }
-    }
-
-    void ResetAmmoCapacity()
-    {
-        ammoCount = AmmoCapacity;
-    }
-
-    void ShowReloadAnimation()
-    {
-        reloadScreen.SetActive(true);
-    }
-
-    void HideReloadAnimation()
-    {
-        reloadScreen.SetActive(false);
-    }
-
-    public void ReloadGrenade()
-    {
-        if (grenadeCount == 0 || hasDied)
-        {
-            grenadeCount = GrenadeCapacity;
-        }
-    }
-
-    public void ResetShieldCount()
-    {
-        shieldCount = ShieldCapacity;
     }
 
     void updateKills()
     {
-        // If player hasn't died
-        // if (!hasDied)
-        // {
-        if (enemyHealth.getHealth() <= 0 && !enemyDied)
+        if (opponent.enemyHealth.getHealth() <= 0 && !opponent.GetHasDied())
         {
-            enemyDied = true;
+            opponent.SetHasDied(true);
             killCount++;
-            ResetEnemyHealth();
+            opponent.Respawn();
         }
-        enemyDied = false;
-        // }
+        opponent.SetHasDied(false);
     }
 
     void updateDeaths()
     {
-        if (playerHealth.getHealth() <= 0)
+        if (player.playerHealth.getHealth() <= 0)
         {
-            hasDied = true;
+            player.SetHasDied(true);
             deathCount++;
             // Respawn timer here? 
-            ResetShieldCount();
-            ReloadAmmo();
-            ReloadGrenade();
-            ResetHealth();
+            player.Respawn();
         }
-        hasDied = false;
+        player.SetHasDied(false);
     }
 
     public void showEnemyHealthBar()
     {
         enemyHealthbarCanvas.SetActive(true);
-        if (enemyHasShield)
+        if (opponent.GetHasShield())
         {
             enemyShield.SetActive(true);
         }
@@ -326,5 +81,54 @@ public class GameLogic : MonoBehaviour
     public bool getEnemyVisible()
     {
         return enemyVisible;
+    }
+
+    // Testing functions
+    public void DealBulletDamageP1()
+    {
+        if (player.GetAmmoCount() > 0 && player.playerHealth.getHealth() > 0)
+        {
+            opponent.ReceiveDamage(10);
+            player.shotFired();
+        }
+    }
+
+    public void DealGrenadeDamageP1()
+    {
+        if (player.GetGrenadeCount() > 0 && player.playerHealth.getHealth() > 0)
+        {
+            grenadeThrower.ThrowGrenade();
+            Invoke("GrenadeDamageP1", 2.5f);
+            player.grenadeThrown();
+        }
+    }
+
+    void GrenadeDamageP1()
+    {
+        opponent.ReceiveDamage(30);
+    }
+
+    public void DealBulletDamageP2()
+    {
+        if (opponent.GetAmmoCount() > 0 && opponent.enemyHealth.getHealth() > 0)
+        {
+            player.ReceiveDamage(10);
+            opponent.ShotFired();
+        }
+    }
+
+    public void DealGrenadeDamageP2()
+    {
+        if (opponent.GetGrenadeCount() > 0 && opponent.enemyHealth.getHealth() > 0)
+        {
+            // grenadeThrower.ThrowGrenade();
+            Invoke("GrenadeDamageP2", 2.5f);
+            opponent.GrenadeThrown();
+        }
+    }
+
+    void GrenadeDamageP2()
+    {
+        player.ReceiveDamage(30);
     }
 }
