@@ -88,7 +88,10 @@ public class GameLogic : MonoBehaviour
     {
         if (player.GetAmmoCount() > 0 && player.playerHealth.getHealth() > 0)
         {
-            opponent.ReceiveDamage(10);
+            if (enemyVisible)
+            {
+                opponent.ReceiveDamage(10);
+            }
             player.shotFired();
         }
     }
@@ -98,7 +101,7 @@ public class GameLogic : MonoBehaviour
         if (player.GetGrenadeCount() > 0 && player.playerHealth.getHealth() > 0)
         {
             grenadeThrower.ThrowGrenade();
-            Invoke("GrenadeDamageP1", 2.5f);
+            if (enemyVisible) Invoke("GrenadeDamageP1", 2.5f);
             player.grenadeThrown();
         }
     }
