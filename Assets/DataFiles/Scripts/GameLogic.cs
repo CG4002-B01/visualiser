@@ -14,6 +14,7 @@ public class GameLogic : MonoBehaviour
     public Opponent opponent;
     public HUDText hudTexts;
     public GrenadeThrower grenadeThrower;
+    public EnemyGrenadeThrower enemyGrenadeThrower;
     public RayGun ammoFirer;
     public Console serverComms;
     // Start is called before the first frame update
@@ -136,6 +137,7 @@ public class GameLogic : MonoBehaviour
     {
         if (opponent.GetGrenadeCount() > 0 && opponent.enemyHealth.getHealth() > 0)
         {
+            enemyGrenadeThrower.ThrowGrenade();
             // grenadeThrower.ThrowGrenade();
             Invoke("GrenadeDamageP2", 2.5f);
             opponent.GrenadeThrown();
