@@ -21,49 +21,105 @@ public class Console : MonoBehaviour {
     ForwardedPortLocal port;
     SshClient stuClient;
     Thread recvThread;
+    Thread sendThread;
 
-    IEnumerator coroutine;
     public TMP_Text consoleText;
+    string textToUpdate;
+
+    int player = 1; // TODO: set on connect
+
+    string recvState = "";
+    bool newState = false;
+
+    // To see if throw action received 
+    bool grenadeCheck = false;
+
+    // Opponent in view 
+    bool grenadeHit = false;    
+
+    void Update() {
+        consoleText.text = textToUpdate;
+    }
+
+    public string getGameState() { // can switch to return gamestate class
+        return recvState;
+    }
+
+    public bool hasNewGameState() {
+        return newState;
+    }
+
+    public void setReadGameState() {
+        newState = false;
+    }
+
+    public bool hasGrenadeCheck() {
+        return grenadeCheck;
+    }
+
+    public void completeGrenadeCheck() {
+        grenadeCheck = false;
+    }
+
+    public void setGrenadeHit(bool status) {
+        grenadeHit = status;
+    }
+
+    public void setGrenadeCheck(bool status) {
+        grenadeCheck = status;
+    }
 
     public void connect() {
         // Tunnel
-        stuClient = new SshClient(stuHost, stuUser, stuPass);
-        stuClient.Connect();
+        // stuClient = new SshClient(stuHost, stuUser, stuPass);
+        // stuClient.Connect();
 
-        port = new ForwardedPortLocal("127.0.0.1", ultra96Host, 5001);
-        stuClient.AddForwardedPort(port);
-        port.Start();
-        Debug.Log(port.BoundPort);
-
-        // Socket
-        int socketPort = Convert.ToInt32(port.BoundPort);
-        socket = new Socket(SocketType.Stream, ProtocolType.Tcp);
+        // port = new ForwardedPortLocal("127.0.0.1", ultra96Host, 5001);
+        // stuClient.AddForwardedPort(port);
+        // port.Start();
+        // Debug.Log(port.BoundPort);
         
-        socket.Connect(port.BoundHost, socketPort);
+        // int socketPort = Convert.ToInt32(port.BoundPort);
+        socket = new Socket(SocketType.Stream, ProtocolType.Tcp);
+        socket.Connect("localhost", 5001); //For local testing
+        // socket.Connect(port.BoundHost, socketPort);
 
+        try {
+            recvThread = new Thread (new ThreadStart(startRecv)); 			
+            recvThread.IsBackground = true; 			
+            recvThread.Start();
+            
+            sendThread = new Thread (new ThreadStart(startSend)); 			
+            sendThread.IsBackground = true; 			
+            sendThread.Start();
+        } catch (Exception e) {
+            Debug.Log(e);
+        }
+    }
+
+    public void startRecv() {
         // Authorize
-        byte[] message = Encoding.ASCII.GetBytes("1"); //player.ToString()
+        byte[] message = Encoding.ASCII.GetBytes(player.ToString());
         socket.Send(message);
 
         byte[] data = new byte[1024];
         socket.Receive(data);
         string response = Encoding.UTF8.GetString(data);
 
-        consoleText.text = response;
+        textToUpdate = response;
         Debug.Log("connected");
 
-        coroutine = recvLoop();
-        StartCoroutine(coroutine);
+        recvLoop();
     }
 
-    IEnumerator recvLoop() {
+    public void recvLoop() {
+        Debug.Log("Start receive loop");
         while (true) {
             string response = receiveMsg();
             Debug.Log("received: " + response);
-            consoleText.text = response;
+            textToUpdate = response;
 
             handleMsg(response);
-            yield return null;
         }
     }
     
@@ -89,17 +145,8 @@ public class Console : MonoBehaviour {
                 return "";
             }
 
-            int byteRecv = 0;
             var data = new byte[1024];
-            while (byteRecv < packetSize) {
-                int bytes = socket.Receive(data, byteRecv, packetSize - byteRecv, SocketFlags.None);
-                byteRecv += bytes;
-                if (bytes == 0) {
-                    disconnect();
-                    return "";
-                }
-            }
-
+            int byteRecv = socket.Receive(data, packetSize, SocketFlags.None);
             string response = Encoding.UTF8.GetString(data, 0, byteRecv);
             if (response.Length == 0) {
                 disconnect();
@@ -117,11 +164,26 @@ public class Console : MonoBehaviour {
 
     public void handleMsg(string msg) {
         Debug.Log(msg);
-        if (msg.Contains("\"action\": \"throw\", \"player\":")) {
-            Debug.Log("grenade");
-            //check if have opp in view
-            var response = "{\"action\": \"grenade\"}"; // standard response
-            sendMsg(response);
+
+        if (msg.Contains("throwcheck")) { // msg format: throwcheck:1
+            string throwPlayer = msg.Split(':')[1];
+            if (throwPlayer == player.ToString()) {
+                grenadeCheck = true;
+                // grenadeHit = true; // testing only
+            }
+        } else {
+            recvState = msg;
+            newState = true;
+        }
+    }
+
+    public void startSend() {
+        while (true) {
+            if (grenadeHit) {
+                var response = "{\"action\": \"grenade\"}"; // standard response
+                sendMsg(response);
+                grenadeHit = false;
+            }
         }
     }
     
@@ -138,8 +200,8 @@ public class Console : MonoBehaviour {
     }
 
     public void disconnect() {
-        // recvThread.Abort();
-        StopCoroutine(coroutine);
+        recvThread.Abort();
+        sendThread.Abort();
         socket.Close();
         port.Stop();
         stuClient.Disconnect();
@@ -147,6 +209,7 @@ public class Console : MonoBehaviour {
     }
 
     public void close() {
+        disconnect();
         Debug.Log("exit");
         consoleText.text = "exit";
         Application.Quit();

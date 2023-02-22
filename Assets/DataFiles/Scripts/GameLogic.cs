@@ -14,6 +14,7 @@ public class GameLogic : MonoBehaviour
     public Opponent opponent;
     public HUDText hudTexts;
     public GrenadeThrower grenadeThrower;
+    public Console serverComms;
     // Start is called before the first frame update
     void Start()
     {
@@ -27,6 +28,15 @@ public class GameLogic : MonoBehaviour
         updateDeaths();
         updateKills();
         UpdateHUDTexts();
+        UpdateServer();
+    }
+
+    void UpdateServer()
+    {
+        if (serverComms.hasGrenadeCheck() && enemyVisible) {
+            serverComms.setGrenadeHit(true);
+            serverComms.setGrenadeCheck(false);
+        } 
     }
 
     void UpdateHUDTexts()
