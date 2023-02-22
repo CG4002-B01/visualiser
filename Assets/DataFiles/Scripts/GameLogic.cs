@@ -14,6 +14,7 @@ public class GameLogic : MonoBehaviour
     public Opponent opponent;
     public HUDText hudTexts;
     public GrenadeThrower grenadeThrower;
+    public RayGun ammoFirer;
     public Console serverComms;
     // Start is called before the first frame update
     void Start()
@@ -102,6 +103,7 @@ public class GameLogic : MonoBehaviour
             {
                 opponent.ReceiveDamage(10);
             }
+            ammoFirer.bulletAnimation();
             player.shotFired();
         }
     }
