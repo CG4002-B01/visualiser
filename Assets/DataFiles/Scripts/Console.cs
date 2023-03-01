@@ -23,6 +23,7 @@ public class Console : MonoBehaviour {
     Thread recvThread;
     Thread sendThread;
 
+    public JSONReader jsonReader;
     public TMP_Text consoleText;
     string textToUpdate;
 
@@ -34,7 +35,7 @@ public class Console : MonoBehaviour {
     // To see if throw action received 
     bool grenadeCheck = false;
 
-    // Opponent in view 
+    // Opponent in view and grenade can hit
     bool grenadeHit = false;    
 
     void Update() {
@@ -117,9 +118,13 @@ public class Console : MonoBehaviour {
         while (true) {
             string response = receiveMsg();
             Debug.Log("received: " + response);
-            textToUpdate = response;
+            jsonReader.setTextJSON(response);
+            
+            // For printing json received on screen directly
+            // textToUpdate = response;
 
-            handleMsg(response);
+            // For checking if throw action
+            // handleMsg(response);
         }
     }
     
