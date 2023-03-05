@@ -5,6 +5,7 @@ using UnityEngine;
 using TMPro;
 
 using System.Text;
+using System.Net;
 using System.Net.Sockets;
 using Renci.SshNet;
 using System.Threading;
@@ -71,7 +72,7 @@ public class Console : MonoBehaviour {
     }
 
     public void connect() {
-        // Tunnel
+        // Tunnel to Ultra96
         // stuClient = new SshClient(stuHost, stuUser, stuPass);
         // stuClient.Connect();
 
@@ -79,11 +80,21 @@ public class Console : MonoBehaviour {
         // stuClient.AddForwardedPort(port);
         // port.Start();
         // Debug.Log(port.BoundPort);
+
+        // For testing
+        IPAddress[] IPs = Dns.GetHostAddresses("localhost");
+        string localhostName = "127.0.0.1"; //For testing on Jon's laptop
+        System.Int32 localhostPortNo = 5004;
         
         // int socketPort = Convert.ToInt32(port.BoundPort);
         socket = new Socket(SocketType.Stream, ProtocolType.Tcp);
-        socket.Connect("localhost", 5001); //For local testing
-        // socket.Connect(port.BoundHost, socketPort);
+        try {
+            socket.Connect(localhostName, localhostPortNo); // Testing by connecting to local host
+            // socket.Connect(IPs[0], localhostPortNo); //Connect to local host via IP
+        } catch (Exception e) {
+            Debug.Log(e);
+        }
+        // socket.Connect(port.BoundHost, socketPort); // For connecting to Ultra96
 
         try {
             recvThread = new Thread (new ThreadStart(startRecv)); 			
@@ -106,15 +117,16 @@ public class Console : MonoBehaviour {
         byte[] data = new byte[1024];
         socket.Receive(data);
         string response = Encoding.UTF8.GetString(data);
+        Debug.Log(response);
 
         textToUpdate = response;
+
         Debug.Log("connected");
 
         recvLoop();
     }
 
     public void recvLoop() {
-        Debug.Log("Start receive loop");
         while (true) {
             string response = receiveMsg();
             Debug.Log("received: " + response);
