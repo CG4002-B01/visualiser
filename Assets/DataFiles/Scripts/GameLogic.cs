@@ -17,6 +17,7 @@ public class GameLogic : MonoBehaviour
     public EnemyGrenadeThrower enemyGrenadeThrower;
     public RayGun ammoFirer;
     public Console serverComms;
+    public JSONReader dataReceived;
     // Start is called before the first frame update
     void Start()
     {
@@ -29,6 +30,7 @@ public class GameLogic : MonoBehaviour
     {
         updateDeaths();
         updateKills();
+        UpdateHealth();
         UpdateHUDTexts();
         UpdateServer();
     }
@@ -43,8 +45,14 @@ public class GameLogic : MonoBehaviour
 
     void UpdateHUDTexts()
     {
-        hudTexts.SetKillCount(killCount.ToString());
-        hudTexts.SetDeathCount(deathCount.ToString());
+        hudTexts.SetKillCount(dataReceived.getOwnKills().ToString());
+        hudTexts.SetDeathCount(dataReceived.getOwnDeaths().ToString());
+    }
+
+    void UpdateHealth()
+    {
+        player.SetOwnHealth((float)dataReceived.getOwnHealth());
+        opponent.SetOpponentHealth((float)dataReceived.getEnemyHealth());
     }
 
     void updateKills()
