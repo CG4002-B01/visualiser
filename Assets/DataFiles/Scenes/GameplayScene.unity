@@ -6314,6 +6314,7 @@ MonoBehaviour:
   enemyGrenadeThrower: {fileID: 46386620}
   ammoFirer: {fileID: 1712579706}
   serverComms: {fileID: 1712579702}
+  dataReceived: {fileID: 1712579707}
 --- !u!114 &1712579699
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -6448,7 +6449,32 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 68e6299748cd446f186c21671b7bd8bc, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  textJSON: {fileID: 0}
+  textJSON: 
+  fullGameState:
+    player:
+      p1:
+        hp: 0
+        action: 
+        bullets: 0
+        grenades: 0
+        shield_time: 0
+        shield_health: 0
+        num_deaths: 0
+        num_shield: 0
+      p2:
+        hp: 0
+        action: 
+        bullets: 0
+        grenades: 0
+        shield_time: 0
+        shield_health: 0
+        num_deaths: 0
+        num_shield: 0
+    status:
+      p1:
+        num_kills: 0
+      p2:
+        num_kills: 0
 --- !u!1 &1747264209
 GameObject:
   m_ObjectHideFlags: 0

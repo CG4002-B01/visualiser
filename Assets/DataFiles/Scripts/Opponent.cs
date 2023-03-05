@@ -161,4 +161,10 @@ public class Opponent : MonoBehaviour
     {
         grenadeCount--;
     }
+
+    // To be used to update with data received from json
+    public void SetOpponentHealth(float _health)
+    {
+        enemyHealth.SetEnemyHealth(_health);
+    }
 }

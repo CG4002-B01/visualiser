@@ -256,4 +256,10 @@ public class Player : MonoBehaviour
     {
         grenadeCount--;
     }
+
+    // For setting with data received from json
+    public void SetOwnHealth(float _health)
+    {
+        playerHealth.SetHealth(_health);
+    }
 }
