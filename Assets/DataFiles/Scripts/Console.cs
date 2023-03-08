@@ -28,7 +28,7 @@ public class Console : MonoBehaviour {
     public TMP_Text consoleText;
     string textToUpdate;
 
-    int player = 1; // TODO: set on connect
+    int player = GlobalStates.GetPlayerNo(); // TODO: set on connect
 
     string recvState = "";
     bool newState = false;
