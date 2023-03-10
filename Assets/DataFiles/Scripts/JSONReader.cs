@@ -59,6 +59,8 @@ public class JSONReader : MonoBehaviour
     public class Status
     {
         public int num_kills;
+        public int shield_activated;
+        public int last_shield_active_time;
     }
 
     [System.Serializable]

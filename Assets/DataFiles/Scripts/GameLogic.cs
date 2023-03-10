@@ -32,8 +32,8 @@ public class GameLogic : MonoBehaviour
         updateKills();
         UpdateHUDTexts();
         // For integration
-        // UpdateServer();
-        // UpdateHealth();
+        UpdateServer();
+        UpdateHealth();
     }
 
     void UpdateServer()
@@ -47,10 +47,10 @@ public class GameLogic : MonoBehaviour
     void UpdateHUDTexts()
     {
         // For Integration
-        // hudTexts.SetKillCount(dataReceived.getOwnKills().ToString());
-        // hudTexts.SetDeathCount(dataReceived.getOwnDeaths().ToString());
-        hudTexts.SetKillCount(killCount.ToString());
-        hudTexts.SetDeathCount(deathCount.ToString());
+        hudTexts.SetKillCount(dataReceived.getOwnKills().ToString());
+        hudTexts.SetDeathCount(dataReceived.getOwnDeaths().ToString());
+        // hudTexts.SetKillCount(killCount.ToString());
+        // hudTexts.SetDeathCount(deathCount.ToString());
     }
 
     void UpdateHealth()
