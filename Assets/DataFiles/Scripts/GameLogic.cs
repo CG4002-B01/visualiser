@@ -18,24 +18,32 @@ public class GameLogic : MonoBehaviour
     public RayGun ammoFirer;
     public Console serverComms;
     public JSONReader dataReceived;
+    // int connectedPlayer = GlobalStates.GetPlayerNo(); 
+    int connectedPlayer = 1; //For testing only
+    int enemyPlayer;
+
     // Start is called before the first frame update
     void Start()
     {
-        deathCount = 0;
-        killCount = 0;
+        // Used with integration
+        enemyPlayer = (connectedPlayer == 1) ? 2 : 1;
     }
 
     // Update is called once per frame
     void Update()
     {
-        updateDeaths();
-        updateKills();
+        // Used for app only demo
+        // updateDeaths();
+        // updateKills();
+        // Used for both integration and app only demo
         UpdateHUDTexts();
         // For integration
         UpdateServer();
         UpdateHealth();
+        ProcessActions();
     }
 
+    // Integration Functions
     void UpdateServer()
     {
         if (serverComms.hasGrenadeCheck() && enemyVisible) {
@@ -47,18 +55,42 @@ public class GameLogic : MonoBehaviour
     void UpdateHUDTexts()
     {
         // For Integration
-        hudTexts.SetKillCount(dataReceived.getOwnKills().ToString());
-        hudTexts.SetDeathCount(dataReceived.getOwnDeaths().ToString());
+        hudTexts.SetKillCount(dataReceived.getOwnKills(connectedPlayer).ToString());
+        hudTexts.SetDeathCount(dataReceived.getOwnDeaths(connectedPlayer).ToString());
         // hudTexts.SetKillCount(killCount.ToString());
         // hudTexts.SetDeathCount(deathCount.ToString());
     }
 
     void UpdateHealth()
     {
-        player.SetOwnHealth((float)dataReceived.getOwnHealth());
-        opponent.SetOpponentHealth((float)dataReceived.getEnemyHealth());
+        player.SetOwnHealth((float)dataReceived.getOwnHealth(connectedPlayer));
+        opponent.SetOpponentHealth((float)dataReceived.getEnemyHealth(enemyPlayer));
     }
 
+    void ProcessActions()
+    {
+        if (connectedPlayer == 1)
+        {
+            string p1Action = dataReceived.getOwnAction(connectedPlayer);
+            switch(p1Action)
+            {
+                case "Shoot":
+                    HandlePlayerShoots();
+                    break;
+            }
+        }
+        else if (connectedPlayer == 2)
+        {
+            string p2Action = dataReceived.getOwnAction(connectedPlayer);
+        }
+    }
+
+    void HandlePlayerShoots()
+    {
+        ammoFirer.bulletAnimation();
+    }
+
+    // App-only demo functions
     void updateKills()
     {
         if (opponent.enemyHealth.getHealth() <= 0 && !opponent.GetHasDied())
@@ -81,6 +113,7 @@ public class GameLogic : MonoBehaviour
         }
         player.SetHasDied(false);
     }
+    // End here 
 
     public void showEnemyHealthBar()
     {
