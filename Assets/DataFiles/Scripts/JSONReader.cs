@@ -61,6 +61,7 @@ public class JSONReader : MonoBehaviour
         public int num_kills;
         public int shield_activated;
         public int last_shield_active_time;
+        public int id;
     }
 
     [System.Serializable]
@@ -216,6 +217,21 @@ public class JSONReader : MonoBehaviour
         return action;
     }
 
+    public int getOwnId(int connectedPlayer)
+    {
+        int id = -1;
+        switch(connectedPlayer)
+        {
+            case 1:
+                id = fullGameState.status.p1.id;
+                break;
+            case 2:
+                id = fullGameState.status.p2.id;
+                break;
+        }
+        return id;
+    }
+
     // Player 2 Stuff
     public int getEnemyDeaths(int enemyPlayer)
     {
@@ -350,5 +366,20 @@ public class JSONReader : MonoBehaviour
                 break;
         }
         return action;
+    }
+
+    public int getEnemyId(int enemyPlayer)
+    {
+        int id = -1;
+        switch(enemyPlayer)
+        {
+            case 1:
+                id = fullGameState.status.p1.id;
+                break;
+            case 2:
+                id = fullGameState.status.p2.id;
+                break;
+        }
+        return id;
     }
 }

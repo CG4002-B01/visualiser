@@ -8,12 +8,9 @@ public class Player : MonoBehaviour
     public PlayerHealth playerHealth;
     int shieldCount;
     float shieldDamageCount;
-    const int ShieldCapacity = 3;
     bool hasShield;
     bool onCooldown;
-    const int AmmoCapacity = 6;
     int ammoCount;
-    const int GrenadeCapacity = 2;
     int grenadeCount;
     bool receivedDamage;
     bool hasDied;
@@ -31,11 +28,7 @@ public class Player : MonoBehaviour
         shieldScreen.SetActive(false);
         playerHealth.SetMaxHealth(100);
         playerHealth.SetHealth(playerHealth.getMaxHealth());
-        shieldCount = ShieldCapacity;
         shieldDamageCount = 0;
-
-        ammoCount = AmmoCapacity;
-        grenadeCount = GrenadeCapacity;
 
         damageScreen.SetActive(false);
         reloadScreen.SetActive(false);
@@ -51,9 +44,10 @@ public class Player : MonoBehaviour
 
     void UpdateHUDTexts()
     {
-        hudTexts.SetAmmoText(ammoCount + "/" + AmmoCapacity);
-        hudTexts.SetGrenadeText(grenadeCount + "/" + GrenadeCapacity);
-        hudTexts.SetShieldText(shieldCount + "/" + ShieldCapacity);
+        // Used for in app test
+        // hudTexts.SetAmmoText(ammoCount + "/" + AmmoCapacity);
+        // hudTexts.SetGrenadeText(grenadeCount + "/" + GrenadeCapacity);
+        // hudTexts.SetShieldText(shieldCount + "/" + ShieldCapacity);
         hudTexts.SetShieldTimerText(shieldTimerObj.GetTime().ToString("0"));
     }
 
@@ -141,12 +135,12 @@ public class Player : MonoBehaviour
 
     void ResetAmmoCapacity()
     {
-        ammoCount = AmmoCapacity;
+        // ammoCount = AmmoCapacity;
     }
 
     void ResetShieldCount()
     {
-        shieldCount = ShieldCapacity;
+        // shieldCount = ShieldCapacity;
     }
 
     void ResetHealth()
@@ -159,7 +153,7 @@ public class Player : MonoBehaviour
     {
         if (grenadeCount == 0 || hasDied)
         {
-            grenadeCount = GrenadeCapacity;
+            // grenadeCount = GrenadeCapacity;
         }
     }
 

@@ -5,11 +5,11 @@ using UnityEngine;
 
 public class GameLogic : MonoBehaviour
 {
+    const int AmmoCapacity = 6;
+    const int GrenadeCapacity = 2;
+    const int ShieldCapacity = 3;
     public GameObject enemyShield;
     public GameObject enemyHealthbarCanvas;
-    bool enemyVisible;
-    int deathCount;
-    int killCount;
     public Player player;
     public Opponent opponent;
     public HUDText hudTexts;
@@ -21,11 +21,16 @@ public class GameLogic : MonoBehaviour
     // int connectedPlayer = GlobalStates.GetPlayerNo(); 
     int connectedPlayer = 1; //For testing only
     int enemyPlayer;
+    bool enemyVisible;
+    int p1packetId;
+    int p2packetId;
 
     // Start is called before the first frame update
     void Start()
     {
         // Used with integration
+        p1packetId = 0;
+        p2packetId = 0;
         enemyPlayer = (connectedPlayer == 1) ? 2 : 1;
     }
 
@@ -40,16 +45,17 @@ public class GameLogic : MonoBehaviour
         // For integration
         UpdateServer();
         UpdateHealth();
-        ProcessActions();
+        UpdateActions();
     }
 
     // Integration Functions
     void UpdateServer()
     {
-        if (serverComms.hasGrenadeCheck() && enemyVisible) {
+        if (serverComms.hasGrenadeCheck() && enemyVisible)
+        {
             serverComms.setGrenadeHit(true);
             serverComms.setGrenadeCheck(false);
-        } 
+        }
     }
 
     void UpdateHUDTexts()
@@ -57,8 +63,9 @@ public class GameLogic : MonoBehaviour
         // For Integration
         hudTexts.SetKillCount(dataReceived.getOwnKills(connectedPlayer).ToString());
         hudTexts.SetDeathCount(dataReceived.getOwnDeaths(connectedPlayer).ToString());
-        // hudTexts.SetKillCount(killCount.ToString());
-        // hudTexts.SetDeathCount(deathCount.ToString());
+        hudTexts.SetAmmoText(dataReceived.getOwnBulletNum(connectedPlayer) + "/" + AmmoCapacity);
+        hudTexts.SetGrenadeText(dataReceived.getOwnGrenade(connectedPlayer) + "/" + GrenadeCapacity);
+        hudTexts.SetShieldText(dataReceived.getOwnShieldNum(connectedPlayer) + "/" + ShieldCapacity);
     }
 
     void UpdateHealth()
@@ -67,21 +74,31 @@ public class GameLogic : MonoBehaviour
         opponent.SetOpponentHealth((float)dataReceived.getEnemyHealth(enemyPlayer));
     }
 
-    void ProcessActions()
+    void UpdateActions()
     {
-        if (connectedPlayer == 1)
+        switch (connectedPlayer)
         {
-            string p1Action = dataReceived.getOwnAction(connectedPlayer);
-            switch(p1Action)
-            {
-                case "Shoot":
-                    HandlePlayerShoots();
-                    break;
-            }
+            case 1:
+                if (dataReceived.getOwnId(connectedPlayer) != p1packetId)
+                {
+                    p1packetId = dataReceived.getOwnId(connectedPlayer);
+                    // Process Actions
+                    string p1Action = dataReceived.getOwnAction(connectedPlayer);
+                    ProcessActions(p1Action);
+                }
+                break;
+            case 2:
+                break;
         }
-        else if (connectedPlayer == 2)
+    }
+
+    void ProcessActions(string playerAction)
+    {
+        switch (playerAction)
         {
-            string p2Action = dataReceived.getOwnAction(connectedPlayer);
+            case "shoot":
+                HandlePlayerShoots();
+                break;
         }
     }
 
@@ -96,7 +113,7 @@ public class GameLogic : MonoBehaviour
         if (opponent.enemyHealth.getHealth() <= 0 && !opponent.GetHasDied())
         {
             opponent.SetHasDied(true);
-            killCount++;
+            // killCount++;
             opponent.Respawn();
         }
         opponent.SetHasDied(false);
@@ -107,7 +124,7 @@ public class GameLogic : MonoBehaviour
         if (player.playerHealth.getHealth() <= 0)
         {
             player.SetHasDied(true);
-            deathCount++;
+            // deathCount++;
             // Respawn timer here? 
             player.Respawn();
         }
