@@ -232,6 +232,21 @@ public class JSONReader : MonoBehaviour
         return id;
     }
 
+    public int isOwnShieldActivated(int connectedPlayer)
+    {
+        int status = -1;
+        switch(connectedPlayer)
+        {
+            case 1:
+                status = fullGameState.status.p1.shield_activated;
+                break;
+            case 2:
+                status = fullGameState.status.p2.shield_activated;
+                break;
+        }
+        return status;
+    }
+
     // Player 2 Stuff
     public int getEnemyDeaths(int enemyPlayer)
     {
@@ -381,5 +396,20 @@ public class JSONReader : MonoBehaviour
                 break;
         }
         return id;
+    }
+
+    public int isEnemyShieldActivated(int enemyPlayer)
+    {
+        int status = -1;
+        switch(enemyPlayer)
+        {
+            case 1:
+                status = fullGameState.status.p1.shield_activated;
+                break;
+            case 2:
+                status = fullGameState.status.p2.shield_activated;
+                break;
+        }
+        return status;
     }
 }

@@ -5,9 +5,6 @@ using UnityEngine;
 
 public class Opponent : MonoBehaviour
 {
-    const int ShieldCapacity = 3;
-    const int AmmoCapacity = 6;
-    const int GrenadeCapacity = 2;
     public EnemyHealth enemyHealth;
     public GameObject enemyShield;
     public TimerOpp shieldTimerObj;
@@ -22,10 +19,6 @@ public class Opponent : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        ammoCount = AmmoCapacity;
-        grenadeCount = GrenadeCapacity;
-        shieldCount = ShieldCapacity;
-
         enemyHealth.SetEnemyHealth(100);
         enemyHealth.SetMaxHealth(100);
     }
