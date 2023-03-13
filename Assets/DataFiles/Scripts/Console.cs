@@ -32,6 +32,8 @@ public class Console : MonoBehaviour
     // int player = GlobalStates.GetPlayerNo(); 
     int player = 1; // TODO: set on connect
 
+    int enemyPlayer;
+
     string recvState = "";
     bool newState = false;
 
@@ -40,6 +42,11 @@ public class Console : MonoBehaviour
 
     // Opponent in view and grenade can hit
     bool grenadeHit = false;
+
+    void Start()
+    {
+        enemyPlayer = player == 1 ? 2 : 1;
+    }
 
     void Update()
     {
@@ -240,7 +247,7 @@ public class Console : MonoBehaviour
             if (grenadeHit)
             {
                 // Old Response
-                var response = "{\"action\": \"grenade\"}"; // standard response
+                var response = "{\"action\": \"grenade\", \"player\": " + enemyPlayer + "}"; 
                 // New Response
                 // var response = "{\"type\": \"action\", \"data\": \"grenade\"}";
                 sendMsg(response);
