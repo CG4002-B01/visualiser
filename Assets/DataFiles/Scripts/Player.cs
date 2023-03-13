@@ -143,11 +143,6 @@ public class Player : MonoBehaviour
         return grenadeCount;
     }
 
-    public void grenadeThrown()
-    {
-        grenadeCount--;
-    }
-
     // For setting with data received from json
     public void SetOwnHealth(float _health)
     {

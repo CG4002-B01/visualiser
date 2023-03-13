@@ -34,6 +34,8 @@ public class GameLogic : MonoBehaviour
         p2packetId = 0;
         isP1ShieldActivated = 0;
         enemyPlayer = (connectedPlayer == 1) ? 2 : 1;
+        // Connect on scene Change
+        serverComms.connect();
     }
 
     // Update is called once per frame
@@ -42,21 +44,21 @@ public class GameLogic : MonoBehaviour
         // Used for both integration and app only demo
         UpdateHUDTexts();
         // For integration
-        UpdateServer();
+        // UpdateServer();
         UpdateHealth();
         UpdateShield();
         UpdateActions();
     }
 
     // Integration Functions
-    void UpdateServer()
-    {
-        if (serverComms.hasGrenadeCheck() && enemyVisible)
-        {
-            serverComms.setGrenadeHit(true);
-            serverComms.setGrenadeCheck(false);
-        }
-    }
+    // void UpdateServer()
+    // {
+    //     if (serverComms.hasGrenadeCheck() && enemyVisible)
+    //     {
+    //         serverComms.setGrenadeHit(true);
+    //         serverComms.setGrenadeCheck(false);
+    //     }
+    // }
 
     void UpdateHUDTexts()
     {
@@ -138,6 +140,7 @@ public class GameLogic : MonoBehaviour
             case "throw":
                 // Check if player is visible, update engine result
                 // Show grenade animation regardless for thrower
+                HandleThrowGrenade();
                 break;
         }
     }
@@ -157,6 +160,19 @@ public class GameLogic : MonoBehaviour
     {
         isP1ShieldActivated = dataReceived.isOwnShieldActivated(connectedPlayer);
         player.ActivateShield();
+    }
+
+    void HandleThrowGrenade()
+    {
+        Debug.Log("Throw Grenade");
+        // Animation
+        grenadeThrower.ThrowGrenade();
+
+        // Return enemy visibility to game engine
+        if (enemyVisible)
+        {
+            serverComms.setGrenadeHit(true);
+        }
     }
 
     public void showEnemyHealthBar()
@@ -190,8 +206,8 @@ public class GameLogic : MonoBehaviour
         if (player.GetGrenadeCount() > 0 && player.playerHealth.getHealth() > 0)
         {
             grenadeThrower.ThrowGrenade();
-            if (enemyVisible) Invoke("GrenadeDamageP1", 2.5f);
-            player.grenadeThrown();
+            // if (enemyVisible) Invoke("GrenadeDamageP1", 2.5f);
+            // player.grenadeThrown();
         }
     }
 
