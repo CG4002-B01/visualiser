@@ -36,7 +36,7 @@ public class Console : MonoBehaviour
     bool newState = false;
 
     // To see if throw action received 
-    bool grenadeCheck = false;
+    // bool grenadeCheck = false;
 
     // Opponent in view and grenade can hit
     bool grenadeHit = false;
@@ -66,25 +66,25 @@ public class Console : MonoBehaviour
         newState = false;
     }
 
-    public bool hasGrenadeCheck()
-    {
-        return grenadeCheck;
-    }
+    // public bool hasGrenadeCheck()
+    // {
+    //     return grenadeCheck;
+    // }
 
-    public void completeGrenadeCheck()
-    {
-        grenadeCheck = false;
-    }
+    // public void completeGrenadeCheck()
+    // {
+    //     grenadeCheck = false;
+    // }
 
     public void setGrenadeHit(bool status)
     {
         grenadeHit = status;
     }
 
-    public void setGrenadeCheck(bool status)
-    {
-        grenadeCheck = status;
-    }
+    // public void setGrenadeCheck(bool status)
+    // {
+    //     grenadeCheck = status;
+    // }
 
     public void connect()
     {
@@ -131,7 +131,8 @@ public class Console : MonoBehaviour
         }
     }
 
-    public void startRecv() {
+    public void startRecv()
+    {
         // Authorize
         byte[] message = Encoding.ASCII.GetBytes(player.ToString());
         socket.Send(message);
@@ -149,12 +150,14 @@ public class Console : MonoBehaviour
         recvLoop();
     }
 
-    public void recvLoop() {
-        while (true) {
+    public void recvLoop()
+    {
+        while (true)
+        {
             string response = receiveMsg();
             Debug.Log("received: " + response);
             jsonReader.setTextJSON(response);
-            
+
             // For printing json received on screen directly
             // textToUpdate = response;
 
@@ -219,7 +222,7 @@ public class Console : MonoBehaviour
             string throwPlayer = msg.Split(':')[1];
             if (throwPlayer == player.ToString())
             {
-                grenadeCheck = true;
+                // grenadeCheck = true;
                 // grenadeHit = true; // testing only
             }
         }
@@ -236,7 +239,10 @@ public class Console : MonoBehaviour
         {
             if (grenadeHit)
             {
+                // Old Response
                 var response = "{\"action\": \"grenade\"}"; // standard response
+                // New Response
+                // var response = "{\"type\": \"action\", \"data\": \"grenade\"}";
                 sendMsg(response);
                 grenadeHit = false;
             }
@@ -247,6 +253,7 @@ public class Console : MonoBehaviour
     {
         var msgLength = msg.Length;
         msg = msgLength + "_" + msg;
+        Debug.Log("sent: " + msg);
         try
         {
             byte[] msgBytes = Encoding.ASCII.GetBytes(msg);

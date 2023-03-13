@@ -121,9 +121,11 @@ public class GameLogic : MonoBehaviour
         switch (playerAction)
         {
             case "shoot":
+                // For P1
                 HandlePlayerShoots();
                 break;
             case "reload":
+                // For P1
                 HandlePlayerReload();
                 break;
             case "shield":
@@ -171,6 +173,7 @@ public class GameLogic : MonoBehaviour
         // Return enemy visibility to game engine
         if (enemyVisible)
         {
+            Debug.Log("Grenade Hit");
             serverComms.setGrenadeHit(true);
         }
     }
