@@ -144,6 +144,20 @@ public class GameLogic : MonoBehaviour
                 // Show grenade animation regardless for thrower
                 HandleThrowGrenade();
                 break;
+            case "hit":
+                // Receive Damage for getting shot
+                if(caller == connectedPlayer)
+                {
+                    PlayerReceiveDamage();
+                }
+                break;
+            case "grenade":
+                // Receive Damage from getting grenaded
+                if (caller == connectedPlayer)
+                {
+                    PlayerReceiveDamage();
+                }
+                break;
         }
     }
 
@@ -178,6 +192,11 @@ public class GameLogic : MonoBehaviour
         }
     }
 
+    void PlayerReceiveDamage()
+    {
+        player.ReceiveDamage();
+    }
+
     public void showEnemyHealthBar()
     {
         enemyHealthbarCanvas.SetActive(true);
@@ -201,26 +220,6 @@ public class GameLogic : MonoBehaviour
     public bool getEnemyVisible()
     {
         return enemyVisible;
-    }
-
-    // Testing functions
-    public void DealGrenadeDamageP1()
-    {
-        if (player.GetGrenadeCount() > 0 && player.playerHealth.getHealth() > 0)
-        {
-            grenadeThrower.ThrowGrenade();
-            // if (enemyVisible) Invoke("GrenadeDamageP1", 2.5f);
-            // player.grenadeThrown();
-        }
-    }
-
-    public void DealBulletDamageP2()
-    {
-        if (opponent.GetAmmoCount() > 0 && opponent.enemyHealth.getHealth() > 0)
-        {
-            player.ReceiveDamage(10);
-            opponent.ShotFired();
-        }
     }
 
     public void DealGrenadeDamageP2()

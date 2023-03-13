@@ -112,19 +112,10 @@ public class Player : MonoBehaviour
         Invoke("ResetAmmoCapacity", 0.5f);
     }
 
-    public void ReceiveDamage(float damagePoints)
+    public void ReceiveDamage()
     {
         // For P1
-        if (playerHealth.getHealth() > 0)
-        {
-            receivedDamage = true;
-            float tempHealth = playerHealth.getHealth() - damagePoints;
-            if (tempHealth < 0)
-            {
-                tempHealth = 0;
-            }
-            playerHealth.SetHealth(tempHealth);
-        }
+        receivedDamage = true;
     }
 
     // Getters and Setters
