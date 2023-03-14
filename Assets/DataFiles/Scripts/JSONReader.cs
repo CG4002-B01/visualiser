@@ -61,10 +61,11 @@ public class JSONReader : MonoBehaviour
         public int num_kills;
         public int shield_activated;
         public int last_shield_active_time;
+        public int id;
     }
 
     [System.Serializable]
-    public class Db 
+    public class Db
     {
         public Players player;
         public Statuses status;
@@ -81,94 +82,334 @@ public class JSONReader : MonoBehaviour
     // Getters and Setters
 
     // Player 1 Stuff
-    public int getOwnDeaths()
+    public int getOwnDeaths(int connectedPlayer)
     {
-        return fullGameState.player.p1.num_deaths;
+        int noDeaths = 0;
+        switch(connectedPlayer)
+        {
+            case 1:
+                noDeaths = fullGameState.player.p1.num_deaths;
+                break;
+            case 2:
+                noDeaths = fullGameState.player.p2.num_deaths;
+                break;
+        }
+        return noDeaths;
     }
 
-    public int getOwnKills()
+    public int getOwnKills(int connectedPlayer)
     {
-        return fullGameState.status.p1.num_kills;
+        int noKills = 0;
+        switch(connectedPlayer)
+        {
+            case 1:
+                noKills = fullGameState.status.p1.num_kills;
+                break;
+            case 2:
+                noKills = fullGameState.status.p2.num_kills;
+                break;
+        }
+        return noKills;
     }
 
-    public int getOwnHealth()
+    public int getOwnHealth(int connectedPlayer)
     {
-        return fullGameState.player.p1.hp;
+        int health = 0;
+        switch(connectedPlayer)
+        {
+            case 1:
+                health = fullGameState.player.p1.hp;
+                break;
+            case 2:
+                health = fullGameState.player.p2.hp;
+                break;
+        }
+        return health;
     }
 
-    public int getOwnShieldHealth()
+    public int getOwnShieldHealth(int connectedPlayer)
     {
-        return fullGameState.player.p1.shield_health;
+        int shieldHealth = 0;
+        switch(connectedPlayer)
+        {
+            case 1:
+                shieldHealth = fullGameState.player.p1.shield_health;
+                break;
+            case 2:
+                shieldHealth = fullGameState.player.p2.shield_health;
+                break;
+        }
+        return shieldHealth;
     }
 
-    public int getOwnShieldNum()
+    public int getOwnShieldNum(int connectedPlayer)
     {
-        return fullGameState.player.p1.num_shield;
+        int shieldNum = 0;
+        switch(connectedPlayer)
+        {
+            case 1:
+                shieldNum = fullGameState.player.p1.num_shield;
+                break;
+            case 2:
+                shieldNum = fullGameState.player.p2.num_shield;
+                break;
+        }
+        return shieldNum;
     }
 
-    public int getOwnShieldTime()
+    public int getOwnShieldTime(int connectedPlayer)
     {
-        return fullGameState.player.p1.shield_time;
+        int shieldTime = 0;
+        switch(connectedPlayer)
+        {
+            case 1:
+                shieldTime = fullGameState.player.p1.shield_time;
+                break;
+            case 2:
+                shieldTime = fullGameState.player.p2.shield_time;
+                break;
+        }
+        return shieldTime;
     }
 
-    public int getOwnBulletNum()
+    public int getOwnBulletNum(int connectedPlayer)
     {
-        return fullGameState.player.p1.bullets;
+        int bulletNo = 0;
+        switch(connectedPlayer)
+        {
+            case 1:
+                bulletNo = fullGameState.player.p1.bullets;
+                break;
+            case 2:
+                bulletNo = fullGameState.player.p2.bullets;
+                break;
+        }
+        return bulletNo;
     }
 
-    public int getOwnGrenade()
+    public int getOwnGrenade(int connectedPlayer)
     {
-        return fullGameState.player.p1.grenades;
+        int grenadeNo = 0;
+        switch(connectedPlayer)
+        {
+            case 1:
+                grenadeNo = fullGameState.player.p1.grenades;
+                break;
+            case 2:
+                grenadeNo = fullGameState.player.p2.grenades;
+                break;
+        }
+        return grenadeNo;
     }
 
-    public string getOwnAction()
+    public string getOwnAction(int connectedPlayer)
     {
-        return fullGameState.player.p1.action;
+        string action = "";
+        switch(connectedPlayer)
+        {
+            case 1:
+                action = fullGameState.player.p1.action;
+                break;
+            case 2:
+                action = fullGameState.player.p2.action;
+                break;
+        }
+        return action;
+    }
+
+    public int getOwnId(int connectedPlayer)
+    {
+        int id = -1;
+        switch(connectedPlayer)
+        {
+            case 1:
+                id = fullGameState.status.p1.id;
+                break;
+            case 2:
+                id = fullGameState.status.p2.id;
+                break;
+        }
+        return id;
+    }
+
+    public int isOwnShieldActivated(int connectedPlayer)
+    {
+        int status = -1;
+        switch(connectedPlayer)
+        {
+            case 1:
+                status = fullGameState.status.p1.shield_activated;
+                break;
+            case 2:
+                status = fullGameState.status.p2.shield_activated;
+                break;
+        }
+        return status;
     }
 
     // Player 2 Stuff
-    public int getEnemyDeaths()
+    public int getEnemyDeaths(int enemyPlayer)
     {
-        return fullGameState.player.p2.num_deaths;
+        int noDeaths = 0;
+        switch(enemyPlayer)
+        {
+            case 1:
+                noDeaths = fullGameState.player.p1.num_deaths;
+                break;
+            case 2:
+                noDeaths = fullGameState.player.p2.num_deaths;
+                break;
+        }
+        return noDeaths;
     }
 
-    public int getEnemyKills()
+    public int getEnemyKills(int enemyPlayer)
     {
-        return fullGameState.status.p2.num_kills;
+        int noKills = 0;
+        switch(enemyPlayer)
+        {
+            case 1:
+                noKills = fullGameState.status.p1.num_kills;
+                break;
+            case 2:
+                noKills = fullGameState.status.p2.num_kills;
+                break;
+        }
+        return noKills;
     }
 
-    public int getEnemyHealth()
+    public int getEnemyHealth(int enemyPlayer)
     {
-        return fullGameState.player.p2.hp;
+        int health = 0;
+        switch(enemyPlayer)
+        {
+            case 1:
+                health = fullGameState.player.p1.hp;
+                break;
+            case 2:
+                health = fullGameState.player.p2.hp;
+                break;
+        }
+        return health;
     }
 
-    public int getEnemyShieldHealth()
+    public int getEnemyShieldHealth(int enemyPlayer)
     {
-        return fullGameState.player.p2.shield_health;
+        int shieldHealth = 0;
+        switch(enemyPlayer)
+        {
+            case 1:
+                shieldHealth = fullGameState.player.p1.shield_health;
+                break;
+            case 2:
+                shieldHealth = fullGameState.player.p2.shield_health;
+                break;
+        }
+        return shieldHealth;
     }
 
-    public int getEnemyShieldNum()
+    public int getEnemyShieldNum(int enemyPlayer)
     {
-        return fullGameState.player.p2.num_shield;
+        int shieldNum = 0;
+        switch(enemyPlayer)
+        {
+            case 1:
+                shieldNum = fullGameState.player.p1.num_shield;
+                break;
+            case 2:
+                shieldNum = fullGameState.player.p2.num_shield;
+                break;
+        }
+        return shieldNum;
     }
 
-    public int getEnemyShieldTime()
+    public int getEnemyShieldTime(int enemyPlayer)
     {
-        return fullGameState.player.p2.shield_time;
+        int shieldTime = 0;
+        switch(enemyPlayer)
+        {
+            case 1:
+                shieldTime = fullGameState.player.p1.shield_time;
+                break;
+            case 2:
+                shieldTime = fullGameState.player.p2.shield_time;
+                break;
+        }
+        return shieldTime;
     }
 
-    public int getEnemyBulletNum()
+    public int getEnemyBulletNum(int enemyPlayer)
     {
-        return fullGameState.player.p2.bullets;
+        int bulletNo = 0;
+        switch(enemyPlayer)
+        {
+            case 1:
+                bulletNo = fullGameState.player.p1.bullets;
+                break;
+            case 2:
+                bulletNo = fullGameState.player.p2.bullets;
+                break;
+        }
+        return bulletNo;
     }
 
-    public int getEnemyGrenadeNum()
+    public int getEnemyGrenadeNum(int enemyPlayer)
     {
-        return fullGameState.player.p2.grenades;
+        int grenadeNo = 0;
+        switch(enemyPlayer)
+        {
+            case 1:
+                grenadeNo = fullGameState.player.p1.grenades;
+                break;
+            case 2:
+                grenadeNo = fullGameState.player.p2.grenades;
+                break;
+        }
+        return grenadeNo;
     }
 
-    public string getEnemyAction()
+    public string getEnemyAction(int enemyPlayer)
     {
-        return fullGameState.player.p2.action;
+        string action = "";
+        switch(enemyPlayer)
+        {
+            case 1:
+                action = fullGameState.player.p1.action;
+                break;
+            case 2:
+                action = fullGameState.player.p2.action;
+                break;
+        }
+        return action;
+    }
+
+    public int getEnemyId(int enemyPlayer)
+    {
+        int id = -1;
+        switch(enemyPlayer)
+        {
+            case 1:
+                id = fullGameState.status.p1.id;
+                break;
+            case 2:
+                id = fullGameState.status.p2.id;
+                break;
+        }
+        return id;
+    }
+
+    public int isEnemyShieldActivated(int enemyPlayer)
+    {
+        int status = -1;
+        switch(enemyPlayer)
+        {
+            case 1:
+                status = fullGameState.status.p1.shield_activated;
+                break;
+            case 2:
+                status = fullGameState.status.p2.shield_activated;
+                break;
+        }
+        return status;
     }
 }

@@ -32,14 +32,21 @@ public class Console : MonoBehaviour
     // int player = GlobalStates.GetPlayerNo(); 
     int player = 1; // TODO: set on connect
 
+    int enemyPlayer;
+
     string recvState = "";
     bool newState = false;
 
     // To see if throw action received 
-    bool grenadeCheck = false;
+    // bool grenadeCheck = false;
 
     // Opponent in view and grenade can hit
     bool grenadeHit = false;
+
+    void Start()
+    {
+        enemyPlayer = player == 1 ? 2 : 1;
+    }
 
     void Update()
     {
@@ -66,54 +73,53 @@ public class Console : MonoBehaviour
         newState = false;
     }
 
-    public bool hasGrenadeCheck()
-    {
-        return grenadeCheck;
-    }
+    // public bool hasGrenadeCheck()
+    // {
+    //     return grenadeCheck;
+    // }
 
-    public void completeGrenadeCheck()
-    {
-        grenadeCheck = false;
-    }
+    // public void completeGrenadeCheck()
+    // {
+    //     grenadeCheck = false;
+    // }
 
     public void setGrenadeHit(bool status)
     {
         grenadeHit = status;
     }
 
-    public void setGrenadeCheck(bool status)
-    {
-        grenadeCheck = status;
-    }
+    // public void setGrenadeCheck(bool status)
+    // {
+    //     grenadeCheck = status;
+    // }
 
     public void connect()
     {
         // Tunnel to Ultra96
-        // stuClient = new SshClient(stuHost, stuUser, stuPass);
-        // stuClient.Connect();
+        stuClient = new SshClient(stuHost, stuUser, stuPass);
+        stuClient.Connect();
 
-        // port = new ForwardedPortLocal("127.0.0.1", ultra96Host, 5001);
-        // stuClient.AddForwardedPort(port);
-        // port.Start();
-        // Debug.Log(port.BoundPort);
+        port = new ForwardedPortLocal("127.0.0.1", ultra96Host, 5004);
+        stuClient.AddForwardedPort(port);
+        port.Start();
+        Debug.Log(port.BoundPort);
 
         // For testing
-        IPAddress[] IPs = Dns.GetHostAddresses("localhost");
-        string localhostName = "127.0.0.1"; //For testing on Jon's laptop
-        System.Int32 localhostPortNo = 5004;
+        // IPAddress[] IPs = Dns.GetHostAddresses("localhost");
+        // string localhostName = "127.0.0.1"; //For testing on Jon's laptop
+        // System.Int32 localhostPortNo = 5004;
 
-        // int socketPort = Convert.ToInt32(port.BoundPort);
+        int socketPort = Convert.ToInt32(port.BoundPort);
         socket = new Socket(SocketType.Stream, ProtocolType.Tcp);
-        try
-        {
-            socket.Connect(localhostName, localhostPortNo); // Testing by connecting to local host
-            // socket.Connect(IPs[0], localhostPortNo); //Connect to local host via IP
-        }
-        catch (Exception e)
-        {
-            Debug.Log(e);
-        }
-        // socket.Connect(port.BoundHost, socketPort); // For connecting to Ultra96
+        // try
+        // {
+        //     // socket.Connect(localhostName, localhostPortNo); // Testing by connecting to local host
+        // }
+        // catch (Exception e)
+        // {
+        //     Debug.Log(e);
+        // }
+        socket.Connect(port.BoundHost, socketPort); // For connecting to Ultra96
 
         try
         {
@@ -131,7 +137,8 @@ public class Console : MonoBehaviour
         }
     }
 
-    public void startRecv() {
+    public void startRecv()
+    {
         // Authorize
         byte[] message = Encoding.ASCII.GetBytes(player.ToString());
         socket.Send(message);
@@ -149,12 +156,22 @@ public class Console : MonoBehaviour
         recvLoop();
     }
 
-    public void recvLoop() {
-        while (true) {
-            string response = receiveMsg();
-            Debug.Log("received: " + response);
-            jsonReader.setTextJSON(response);
-            
+    public void recvLoop()
+    {
+        while (true)
+        {
+            try
+            {
+                string response = receiveMsg();
+                Debug.Log("received: " + response);
+                jsonReader.setTextJSON(response);
+            }
+            catch (Exception e)
+            {
+                Debug.Log(e);
+            }
+
+
             // For printing json received on screen directly
             // textToUpdate = response;
 
@@ -219,7 +236,7 @@ public class Console : MonoBehaviour
             string throwPlayer = msg.Split(':')[1];
             if (throwPlayer == player.ToString())
             {
-                grenadeCheck = true;
+                // grenadeCheck = true;
                 // grenadeHit = true; // testing only
             }
         }
@@ -236,7 +253,10 @@ public class Console : MonoBehaviour
         {
             if (grenadeHit)
             {
-                var response = "{\"action\": \"grenade\"}"; // standard response
+                // Old Response
+                var response = "{\"action\": \"grenade\", \"player\": " + enemyPlayer + "}";
+                // New Response
+                // var response = "{\"type\": \"action\", \"data\": \"grenade\"}";
                 sendMsg(response);
                 grenadeHit = false;
             }
@@ -247,6 +267,7 @@ public class Console : MonoBehaviour
     {
         var msgLength = msg.Length;
         msg = msgLength + "_" + msg;
+        Debug.Log("sent: " + msg);
         try
         {
             byte[] msgBytes = Encoding.ASCII.GetBytes(msg);

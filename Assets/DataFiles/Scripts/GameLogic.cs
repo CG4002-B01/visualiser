@@ -5,11 +5,11 @@ using UnityEngine;
 
 public class GameLogic : MonoBehaviour
 {
+    const int AmmoCapacity = 6;
+    const int GrenadeCapacity = 2;
+    const int ShieldCapacity = 3;
     public GameObject enemyShield;
     public GameObject enemyHealthbarCanvas;
-    bool enemyVisible;
-    int deathCount;
-    int killCount;
     public Player player;
     public Opponent opponent;
     public HUDText hudTexts;
@@ -18,68 +18,183 @@ public class GameLogic : MonoBehaviour
     public RayGun ammoFirer;
     public Console serverComms;
     public JSONReader dataReceived;
+    // int connectedPlayer = GlobalStates.GetPlayerNo(); 
+    int connectedPlayer = 1; //For testing only
+    int enemyPlayer;
+    bool enemyVisible;
+    int p1packetId;
+    int p2packetId;
+    int isP1ShieldActivated;
+
     // Start is called before the first frame update
     void Start()
     {
-        deathCount = 0;
-        killCount = 0;
+        // Used with integration
+        p1packetId = 0;
+        p2packetId = 0;
+        isP1ShieldActivated = 0;
+        enemyPlayer = (connectedPlayer == 1) ? 2 : 1;
+        // Connect on scene Change
+        serverComms.connect();
     }
 
     // Update is called once per frame
     void Update()
     {
-        updateDeaths();
-        updateKills();
+        // Used for both integration and app only demo
         UpdateHUDTexts();
         // For integration
-        UpdateServer();
+        // UpdateServer();
         UpdateHealth();
+        UpdateShield();
+        UpdateActions();
     }
 
-    void UpdateServer()
-    {
-        if (serverComms.hasGrenadeCheck() && enemyVisible) {
-            serverComms.setGrenadeHit(true);
-            serverComms.setGrenadeCheck(false);
-        } 
-    }
+    // Integration Functions
+    // void UpdateServer()
+    // {
+    //     if (serverComms.hasGrenadeCheck() && enemyVisible)
+    //     {
+    //         serverComms.setGrenadeHit(true);
+    //         serverComms.setGrenadeCheck(false);
+    //     }
+    // }
 
     void UpdateHUDTexts()
     {
         // For Integration
-        hudTexts.SetKillCount(dataReceived.getOwnKills().ToString());
-        hudTexts.SetDeathCount(dataReceived.getOwnDeaths().ToString());
-        // hudTexts.SetKillCount(killCount.ToString());
-        // hudTexts.SetDeathCount(deathCount.ToString());
+        hudTexts.SetKillCount(dataReceived.getOwnKills(connectedPlayer).ToString());
+        hudTexts.SetDeathCount(dataReceived.getOwnDeaths(connectedPlayer).ToString());
+        hudTexts.SetAmmoText(dataReceived.getOwnBulletNum(connectedPlayer) + "/" + AmmoCapacity);
+        hudTexts.SetGrenadeText(dataReceived.getOwnGrenade(connectedPlayer) + "/" + GrenadeCapacity);
+        hudTexts.SetShieldText(dataReceived.getOwnShieldNum(connectedPlayer) + "/" + ShieldCapacity);
     }
 
     void UpdateHealth()
     {
-        player.SetOwnHealth((float)dataReceived.getOwnHealth());
-        opponent.SetOpponentHealth((float)dataReceived.getEnemyHealth());
+        float playerShieldHealth = (float)dataReceived.getOwnShieldHealth(connectedPlayer);
+        float enemyShieldHealth = (float)dataReceived.getEnemyShieldHealth(enemyPlayer);
+        player.SetOwnHealth((float)dataReceived.getOwnHealth(connectedPlayer) + playerShieldHealth);
+        opponent.SetOpponentHealth((float)dataReceived.getEnemyHealth(enemyPlayer) + enemyShieldHealth);
+        player.SetOwnMaxHealth(100 + playerShieldHealth);
+        // Set 1 for opponent too
     }
 
-    void updateKills()
+    void UpdateShield()
     {
-        if (opponent.enemyHealth.getHealth() <= 0 && !opponent.GetHasDied())
+        switch (connectedPlayer)
         {
-            opponent.SetHasDied(true);
-            killCount++;
-            opponent.Respawn();
+            case 1:
+                if (isP1ShieldActivated != dataReceived.isOwnShieldActivated(connectedPlayer))
+                {
+                    if (dataReceived.isOwnShieldActivated(connectedPlayer) == 0)
+                    {
+                        player.DeactivateShield();
+                    }
+                }
+                break;
+            case 2:
+                break;
         }
-        opponent.SetHasDied(false);
     }
 
-    void updateDeaths()
+    void UpdateActions()
     {
-        if (player.playerHealth.getHealth() <= 0)
+        switch (connectedPlayer)
         {
-            player.SetHasDied(true);
-            deathCount++;
-            // Respawn timer here? 
-            player.Respawn();
+            case 1:
+                if (dataReceived.getOwnId(connectedPlayer) != p1packetId)
+                {
+                    p1packetId = dataReceived.getOwnId(connectedPlayer);
+                    // Process Actions
+                    string p1Action = dataReceived.getOwnAction(connectedPlayer);
+                    ProcessActions(p1Action, 1);
+                }
+                break;
+            case 2:
+                break;
         }
-        player.SetHasDied(false);
+    }
+
+    void ProcessActions(string playerAction, int caller)
+    {
+        switch (playerAction)
+        {
+            case "shoot":
+                // For P1
+                HandlePlayerShoots();
+                break;
+            case "reload":
+                // For P1
+                HandlePlayerReload();
+                break;
+            case "shield":
+                if (caller == connectedPlayer)
+                {
+                    HandlePlayerShield();
+                }
+                else
+                {
+                    // HandlePlayerShield(enemyShieldHealth);
+                    // Or should this be handle enemy shield. 
+                }
+                break;
+            case "throw":
+                // Check if player is visible, update engine result
+                // Show grenade animation regardless for thrower
+                HandleThrowGrenade();
+                break;
+            case "hit":
+                // Receive Damage for getting shot
+                if(caller == connectedPlayer)
+                {
+                    PlayerReceiveDamage();
+                }
+                break;
+            case "grenade":
+                // Receive Damage from getting grenaded
+                if (caller == connectedPlayer)
+                {
+                    PlayerReceiveDamage();
+                }
+                break;
+        }
+    }
+
+    void HandlePlayerShoots()
+    {
+        ammoFirer.bulletAnimation();
+        // Damage Screen for enemy
+    }
+
+    void HandlePlayerReload()
+    {
+        player.ReloadAmmo();
+    }
+
+    void HandlePlayerShield()
+    {
+        isP1ShieldActivated = dataReceived.isOwnShieldActivated(connectedPlayer);
+        player.ActivateShield();
+    }
+
+    void HandleThrowGrenade()
+    {
+        Debug.Log("Throw Grenade");
+        // Animation
+        grenadeThrower.ThrowGrenade();
+
+        // Return enemy visibility to game engine
+        if (enemyVisible)
+        {
+            Debug.Log("Grenade Hit");
+            serverComms.setGrenadeHit(true);
+        }
+    }
+
+    void PlayerReceiveDamage()
+    {
+        player.ReceiveDamage();
     }
 
     public void showEnemyHealthBar()
@@ -107,44 +222,6 @@ public class GameLogic : MonoBehaviour
         return enemyVisible;
     }
 
-    // Testing functions
-    public void DealBulletDamageP1()
-    {
-        if (player.GetAmmoCount() > 0 && player.playerHealth.getHealth() > 0)
-        {
-            if (enemyVisible)
-            {
-                opponent.ReceiveDamage(10);
-            }
-            ammoFirer.bulletAnimation();
-            player.shotFired();
-        }
-    }
-
-    public void DealGrenadeDamageP1()
-    {
-        if (player.GetGrenadeCount() > 0 && player.playerHealth.getHealth() > 0)
-        {
-            grenadeThrower.ThrowGrenade();
-            if (enemyVisible) Invoke("GrenadeDamageP1", 2.5f);
-            player.grenadeThrown();
-        }
-    }
-
-    void GrenadeDamageP1()
-    {
-        opponent.ReceiveDamage(30);
-    }
-
-    public void DealBulletDamageP2()
-    {
-        if (opponent.GetAmmoCount() > 0 && opponent.enemyHealth.getHealth() > 0)
-        {
-            player.ReceiveDamage(10);
-            opponent.ShotFired();
-        }
-    }
-
     public void DealGrenadeDamageP2()
     {
         if (opponent.GetGrenadeCount() > 0 && opponent.enemyHealth.getHealth() > 0)
@@ -154,10 +231,5 @@ public class GameLogic : MonoBehaviour
             Invoke("GrenadeDamageP2", 2.5f);
             opponent.GrenadeThrown();
         }
-    }
-
-    void GrenadeDamageP2()
-    {
-        player.ReceiveDamage(30);
     }
 }
