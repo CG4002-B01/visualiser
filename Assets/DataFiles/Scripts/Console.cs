@@ -96,31 +96,30 @@ public class Console : MonoBehaviour
     public void connect()
     {
         // Tunnel to Ultra96
-        // stuClient = new SshClient(stuHost, stuUser, stuPass);
-        // stuClient.Connect();
+        stuClient = new SshClient(stuHost, stuUser, stuPass);
+        stuClient.Connect();
 
-        // port = new ForwardedPortLocal("127.0.0.1", ultra96Host, 5001);
-        // stuClient.AddForwardedPort(port);
-        // port.Start();
-        // Debug.Log(port.BoundPort);
+        port = new ForwardedPortLocal("127.0.0.1", ultra96Host, 5004);
+        stuClient.AddForwardedPort(port);
+        port.Start();
+        Debug.Log(port.BoundPort);
 
         // For testing
-        IPAddress[] IPs = Dns.GetHostAddresses("localhost");
-        string localhostName = "127.0.0.1"; //For testing on Jon's laptop
-        System.Int32 localhostPortNo = 5004;
+        // IPAddress[] IPs = Dns.GetHostAddresses("localhost");
+        // string localhostName = "127.0.0.1"; //For testing on Jon's laptop
+        // System.Int32 localhostPortNo = 5004;
 
-        // int socketPort = Convert.ToInt32(port.BoundPort);
+        int socketPort = Convert.ToInt32(port.BoundPort);
         socket = new Socket(SocketType.Stream, ProtocolType.Tcp);
-        try
-        {
-            socket.Connect(localhostName, localhostPortNo); // Testing by connecting to local host
-            // socket.Connect(IPs[0], localhostPortNo); //Connect to local host via IP
-        }
-        catch (Exception e)
-        {
-            Debug.Log(e);
-        }
-        // socket.Connect(port.BoundHost, socketPort); // For connecting to Ultra96
+        // try
+        // {
+        //     // socket.Connect(localhostName, localhostPortNo); // Testing by connecting to local host
+        // }
+        // catch (Exception e)
+        // {
+        //     Debug.Log(e);
+        // }
+        socket.Connect(port.BoundHost, socketPort); // For connecting to Ultra96
 
         try
         {
@@ -161,9 +160,17 @@ public class Console : MonoBehaviour
     {
         while (true)
         {
-            string response = receiveMsg();
-            Debug.Log("received: " + response);
-            jsonReader.setTextJSON(response);
+            try
+            {
+                string response = receiveMsg();
+                Debug.Log("received: " + response);
+                jsonReader.setTextJSON(response);
+            }
+            catch (Exception e)
+            {
+                Debug.Log(e);
+            }
+
 
             // For printing json received on screen directly
             // textToUpdate = response;
@@ -247,7 +254,7 @@ public class Console : MonoBehaviour
             if (grenadeHit)
             {
                 // Old Response
-                var response = "{\"action\": \"grenade\", \"player\": " + enemyPlayer + "}"; 
+                var response = "{\"action\": \"grenade\", \"player\": " + enemyPlayer + "}";
                 // New Response
                 // var response = "{\"type\": \"action\", \"data\": \"grenade\"}";
                 sendMsg(response);
