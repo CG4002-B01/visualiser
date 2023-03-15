@@ -16,7 +16,9 @@ public class Console : MonoBehaviour
     string stuHost = "stu.comp.nus.edu.sg";
     string stuUser = "xuanlc13";
     string stuPass = "inEAdtoX618rBgfr15qE";
-    string ultra96Host = "192.168.95.224";
+    // string ultra96Host = "192.168.95.224";
+    // Backup Board
+    string ultra96Host = "192.168.95.245";
     string socketHost;
     int socketPort;
     Socket socket;
@@ -38,7 +40,7 @@ public class Console : MonoBehaviour
     bool newState = false;
 
     // To see if throw action received 
-    // bool grenadeCheck = false;
+    bool grenadeCheck = false;
 
     // Opponent in view and grenade can hit
     bool grenadeHit = false;
@@ -78,10 +80,10 @@ public class Console : MonoBehaviour
     //     return grenadeCheck;
     // }
 
-    // public void completeGrenadeCheck()
-    // {
-    //     grenadeCheck = false;
-    // }
+    public void setGrenadeCheck(bool status)
+    {
+        grenadeCheck = status;
+    }
 
     public void setGrenadeHit(bool status)
     {
@@ -251,15 +253,18 @@ public class Console : MonoBehaviour
     {
         while (true)
         {
-            if (grenadeHit)
+            if (grenadeHit && grenadeCheck)
             {
-                // Old Response
-                var response = "{\"action\": \"grenade\", \"player\": " + enemyPlayer + "}";
-                // New Response
-                // var response = "{\"type\": \"action\", \"data\": \"grenade\"}";
-                sendMsg(response);
+                var posResponse = "{\"action\": \"grenade_hit\", \"player\": " + enemyPlayer + "}";
+                sendMsg(posResponse);
                 grenadeHit = false;
             }
+            else if (!grenadeHit && grenadeCheck) 
+            {
+                var negResponse = "{\"action\": \"grenade_miss\", \"player\": " + enemyPlayer + "}";
+                sendMsg(negResponse);
+            }
+            grenadeCheck = false;
         }
     }
 

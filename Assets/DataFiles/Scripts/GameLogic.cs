@@ -139,10 +139,14 @@ public class GameLogic : MonoBehaviour
                     // Or should this be handle enemy shield. 
                 }
                 break;
-            case "throw":
-                // Check if player is visible, update engine result
-                // Show grenade animation regardless for thrower
-                HandleThrowGrenade();
+            case "grenade_hit":
+                // Receive Damage from getting grenaded
+                if (caller == connectedPlayer)
+                {
+                    PlayerReceiveDamage();
+                }
+                break;
+            case "grenade_miss":
                 break;
             case "hit":
                 // Receive Damage for getting shot
@@ -152,10 +156,10 @@ public class GameLogic : MonoBehaviour
                 }
                 break;
             case "grenade":
-                // Receive Damage from getting grenaded
+                // Check if player is visible, update engine result
                 if (caller == connectedPlayer)
                 {
-                    PlayerReceiveDamage();
+                    HandleThrowGrenade();
                 }
                 break;
         }
@@ -183,6 +187,7 @@ public class GameLogic : MonoBehaviour
         Debug.Log("Throw Grenade");
         // Animation
         grenadeThrower.ThrowGrenade();
+        serverComms.setGrenadeCheck(true);
 
         // Return enemy visibility to game engine
         if (enemyVisible)
@@ -190,10 +195,15 @@ public class GameLogic : MonoBehaviour
             Debug.Log("Grenade Hit");
             serverComms.setGrenadeHit(true);
         }
+        else 
+        {
+            serverComms.setGrenadeHit(false);
+        }
     }
 
     void PlayerReceiveDamage()
     {
+        Debug.Log("Hit by Grenade");
         player.ReceiveDamage();
     }
 
