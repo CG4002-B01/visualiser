@@ -98,30 +98,30 @@ public class Console : MonoBehaviour
     public void connect()
     {
         // Tunnel to Ultra96
-        stuClient = new SshClient(stuHost, stuUser, stuPass);
-        stuClient.Connect();
+        // stuClient = new SshClient(stuHost, stuUser, stuPass);
+        // stuClient.Connect();
 
-        port = new ForwardedPortLocal("127.0.0.1", ultra96Host, 5004);
-        stuClient.AddForwardedPort(port);
-        port.Start();
-        Debug.Log(port.BoundPort);
+        // port = new ForwardedPortLocal("127.0.0.1", ultra96Host, 5004);
+        // stuClient.AddForwardedPort(port);
+        // port.Start();
+        // Debug.Log(port.BoundPort);
 
         // For testing
-        // IPAddress[] IPs = Dns.GetHostAddresses("localhost");
-        // string localhostName = "127.0.0.1"; //For testing on Jon's laptop
-        // System.Int32 localhostPortNo = 5004;
+        IPAddress[] IPs = Dns.GetHostAddresses("localhost");
+        string localhostName = "127.0.0.1"; //For testing on Jon's laptop
+        System.Int32 localhostPortNo = 5004;
 
-        int socketPort = Convert.ToInt32(port.BoundPort);
+        // int socketPort = Convert.ToInt32(port.BoundPort);
         socket = new Socket(SocketType.Stream, ProtocolType.Tcp);
-        // try
-        // {
-        //     // socket.Connect(localhostName, localhostPortNo); // Testing by connecting to local host
-        // }
-        // catch (Exception e)
-        // {
-        //     Debug.Log(e);
-        // }
-        socket.Connect(port.BoundHost, socketPort); // For connecting to Ultra96
+        try
+        {
+            socket.Connect(localhostName, localhostPortNo); // Testing by connecting to local host
+        }
+        catch (Exception e)
+        {
+            Debug.Log(e);
+        }
+        // socket.Connect(port.BoundHost, socketPort); // For connecting to Ultra96
 
         try
         {
