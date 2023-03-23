@@ -6,6 +6,7 @@ using UnityEngine;
 public class Opponent : MonoBehaviour
 {
     public EnemyHealth enemyHealth;
+    public EnemyShieldHealth enemyShieldHealth;
     public GameObject enemyShield;
     public TimerOpp shieldTimerObj;
     bool hasDied;
@@ -159,5 +160,10 @@ public class Opponent : MonoBehaviour
     public void SetOpponentHealth(float _health)
     {
         enemyHealth.SetEnemyHealth(_health);
+    }
+
+    public void SetOppponentShieldHealth(float _shieldHealth)
+    {
+        enemyShieldHealth.SetEnemyShieldHealth(_shieldHealth);
     }
 }

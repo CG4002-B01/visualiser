@@ -75,7 +75,8 @@ public class GameLogic : MonoBehaviour
         float playerShieldHealth = (float)dataReceived.getOwnShieldHealth(connectedPlayer);
         float enemyShieldHealth = (float)dataReceived.getEnemyShieldHealth(enemyPlayer);
         player.SetOwnHealth((float)dataReceived.getOwnHealth(connectedPlayer) + playerShieldHealth);
-        opponent.SetOpponentHealth((float)dataReceived.getEnemyHealth(enemyPlayer) + enemyShieldHealth);
+        opponent.SetOpponentHealth((float)dataReceived.getEnemyHealth(enemyPlayer));
+        opponent.SetOppponentShieldHealth(enemyShieldHealth);
         player.SetOwnMaxHealth(100 + playerShieldHealth);
         // Set 1 for opponent too
     }
@@ -210,14 +211,14 @@ public class GameLogic : MonoBehaviour
     public void showEnemyHealthBar()
     {
         enemyHealthbarCanvas.SetActive(true);
-        if (opponent.GetHasShield())
-        {
-            enemyShield.SetActive(true);
-        }
-        else
-        {
-            enemyShield.SetActive(false);
-        }
+        // if (opponent.GetHasShield())
+        // {
+        //     enemyShield.SetActive(true);
+        // }
+        // else
+        // {
+        //     enemyShield.SetActive(false);
+        // }
         enemyVisible = true;
     }
 

@@ -3,37 +3,37 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
-public class EnemyHealth : MonoBehaviour
+public class EnemyShieldHealth : MonoBehaviour
 {
     [SerializeField] Slider slider;
     [SerializeField] Gradient gradient;
     [SerializeField] Image fill;
-    float health, maxHealth;
+    float shieldHealth, maxShieldHealth;
 
     void Start()
     {
-        maxHealth = 100;
+        maxShieldHealth = 30;
     }
 
-    public float getHealth() 
+    public float getShieldHealth() 
     {
-        return health;
+        return shieldHealth;
     }
 
-    public float getMaxHealth()
+    public float getMaxShieldHealth()
     {
-        return maxHealth;
+        return maxShieldHealth;
     }
-    public void SetEnemyHealth(float _health)
+    public void SetEnemyShieldHealth(float _health)
     {
-        health = _health;
+        shieldHealth = _health;
         slider.value = _health;
         fill.color = gradient.Evaluate(slider.normalizedValue);
     }
 
-    public void SetMaxHealth(int _maxHealth)
+    public void SetMaxShieldHealth(int _maxHealth)
     {
-        maxHealth = _maxHealth;
+        maxShieldHealth = _maxHealth;
         slider.maxValue = _maxHealth;
         slider.value = _maxHealth;
         fill.color = gradient.Evaluate(1f);
