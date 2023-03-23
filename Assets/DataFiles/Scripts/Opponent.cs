@@ -8,6 +8,7 @@ public class Opponent : MonoBehaviour
     public EnemyHealth enemyHealth;
     public EnemyShieldHealth enemyShieldHealth;
     public GameObject enemyShield;
+    public GameObject enemyShieldHealthBar;
     public TimerOpp shieldTimerObj;
     bool hasDied;
     bool hasShield;
@@ -28,42 +29,6 @@ public class Opponent : MonoBehaviour
     void Update()
     {
         ShieldTimerCheck();
-    }
-
-    void ActivateShield()
-    {
-        hasShield = true;
-        enemyShield.SetActive(true);
-
-        onCooldown = true;
-        shieldTimerObj.SetStartTimer(true);
-        enemyHealth.SetMaxHealth(130);
-        float currHealth = enemyHealth.getHealth();
-        float newHealth = currHealth + 30;
-        enemyHealth.SetEnemyHealth(newHealth);
-        shieldCount--;
-    }
-
-    void DeactivateShield()
-    {
-        hasShield = false;
-        enemyShield.SetActive(false);
-
-        enemyHealth.SetMaxHealth(100);
-        // Assuming no damage
-        float currHealth = enemyHealth.getHealth();
-        float newHealth;
-
-        if (shieldDamageCount < 30)
-        {
-            newHealth = currHealth - 30;
-        }
-        else
-        {
-            newHealth = currHealth;
-        }
-        enemyHealth.SetEnemyHealth(newHealth);
-        shieldDamageCount = 0;
     }
 
     void ShieldTimerCheck()
@@ -100,26 +65,6 @@ public class Opponent : MonoBehaviour
         }
     }
 
-    public void ToggleEnemyShield()
-    {
-        if (shieldCount > 0)
-        {
-            if (hasShield == true)
-            {
-                DeactivateShield();
-            }
-            else
-            {
-                ActivateShield();
-            }
-        }
-    }
-
-    public void Respawn()
-    {
-        ResetEnemyHealth();
-    }
-
     // Getters and Setters
     public bool GetHasShield()
     {
@@ -136,24 +81,21 @@ public class Opponent : MonoBehaviour
         hasDied = status;
     }
 
-    public int GetAmmoCount()
+    public void ActivateShield()
     {
-        return ammoCount;
+        hasShield = true;
+        enemyShield.SetActive(true);
+        enemyShieldHealthBar.SetActive(true);
+
+        onCooldown = true;
+        shieldTimerObj.SetStartTimer(true);
     }
 
-    public int GetGrenadeCount()
+    public void DeactivateShield()
     {
-        return grenadeCount;
-    }
-
-    public void ShotFired()
-    {
-        ammoCount--;
-    }
-
-    public void GrenadeThrown()
-    {
-        grenadeCount--;
+        hasShield = false;
+        enemyShield.SetActive(false);
+        enemyShieldHealthBar.SetActive(false);
     }
 
     // To be used to update with data received from json

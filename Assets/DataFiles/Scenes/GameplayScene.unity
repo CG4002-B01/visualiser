@@ -4793,6 +4793,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   enemyShield: {fileID: 301824196}
   enemyHealthbarCanvas: {fileID: 97280616}
+  enemyShieldHealthBar: {fileID: 1872022811}
   player: {fileID: 1712579704}
   opponent: {fileID: 1712579703}
   hudTexts: {fileID: 1712579699}
@@ -4876,8 +4877,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   enemyHealth: {fileID: 2065375331}
-  enemyShieldHealth: {fileID: 0}
-  enemyShield: {fileID: 0}
+  enemyShieldHealth: {fileID: 1872022813}
+  enemyShield: {fileID: 301824196}
+  enemyShieldHealthBar: {fileID: 1872022811}
   shieldTimerObj: {fileID: 1712579705}
 --- !u!114 &1712579704
 MonoBehaviour:

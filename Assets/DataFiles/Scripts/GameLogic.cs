@@ -10,6 +10,7 @@ public class GameLogic : MonoBehaviour
     const int ShieldCapacity = 3;
     public GameObject enemyShield;
     public GameObject enemyHealthbarCanvas;
+    public GameObject enemyShieldHealthBar;
     public Player player;
     public Opponent opponent;
     public HUDText hudTexts;
@@ -22,16 +23,19 @@ public class GameLogic : MonoBehaviour
     int connectedPlayer = 1; //For testing only
     int enemyPlayer;
     bool enemyVisible;
-    int p1packetId;
-    int p2packetId;
+    int ownPacketId;
+    int enemyPacketId;
     int isP1ShieldActivated;
+    int isP2ShieldActivated;
 
     // Start is called before the first frame update
     void Start()
     {
+        enemyShieldHealthBar.SetActive(false);
+        enemyShield.SetActive(false);
         // Used with integration
-        p1packetId = 0;
-        p2packetId = 0;
+        ownPacketId = 0;
+        enemyPacketId = 0;
         isP1ShieldActivated = 0;
         enemyPlayer = (connectedPlayer == 1) ? 2 : 1;
         // Connect on scene Change
@@ -78,7 +82,6 @@ public class GameLogic : MonoBehaviour
         opponent.SetOpponentHealth((float)dataReceived.getEnemyHealth(enemyPlayer));
         opponent.SetOppponentShieldHealth(enemyShieldHealth);
         player.SetOwnMaxHealth(100 + playerShieldHealth);
-        // Set 1 for opponent too
     }
 
     void UpdateShield()
@@ -95,6 +98,13 @@ public class GameLogic : MonoBehaviour
                 }
                 break;
             case 2:
+                if (isP2ShieldActivated != dataReceived.isEnemyShieldActivated(enemyPlayer))
+                {
+                    if (dataReceived.isEnemyShieldActivated(connectedPlayer) == 0)
+                    {
+                        opponent.DeactivateShield();
+                    }
+                }
                 break;
         }
     }
@@ -104,15 +114,29 @@ public class GameLogic : MonoBehaviour
         switch (connectedPlayer)
         {
             case 1:
-                if (dataReceived.getOwnId(connectedPlayer) != p1packetId)
+                if (dataReceived.getOwnId(connectedPlayer) != ownPacketId)
                 {
-                    p1packetId = dataReceived.getOwnId(connectedPlayer);
-                    // Process Actions
-                    string p1Action = dataReceived.getOwnAction(connectedPlayer);
-                    ProcessActions(p1Action, 1);
+                    ownPacketId = dataReceived.getOwnId(connectedPlayer);
+                    // Process Own Actions
+                    string ownAction = dataReceived.getOwnAction(connectedPlayer);
+                    ProcessActions(ownAction, 1);
+                }
+                if (dataReceived.getEnemyId(enemyPlayer) != enemyPacketId)
+                {
+                    enemyPacketId = dataReceived.getEnemyId(enemyPlayer);
+                    // Process Enemy Actions
+                    string enemyAction = dataReceived.getEnemyAction(enemyPlayer);
+                    ProcessActions(enemyAction, 2);
                 }
                 break;
             case 2:
+                if (dataReceived.getOwnId(connectedPlayer) != ownPacketId)
+                {
+                    ownPacketId = dataReceived.getOwnId(connectedPlayer);
+                    // Process Actions
+                    string ownAction = dataReceived.getOwnAction(connectedPlayer);
+                    ProcessActions(ownAction, 2);
+                }
                 break;
         }
     }
@@ -136,8 +160,8 @@ public class GameLogic : MonoBehaviour
                 }
                 else
                 {
-                    // HandlePlayerShield(enemyShieldHealth);
-                    // Or should this be handle enemy shield. 
+                    Debug.Log("Handling Enemy Shield");
+                    HandleEnemyShield();
                 }
                 break;
             case "grenade_hit":
@@ -151,7 +175,7 @@ public class GameLogic : MonoBehaviour
                 break;
             case "hit":
                 // Receive Damage for getting shot
-                if(caller == connectedPlayer)
+                if (caller == connectedPlayer)
                 {
                     PlayerReceiveDamage();
                 }
@@ -183,6 +207,12 @@ public class GameLogic : MonoBehaviour
         player.ActivateShield();
     }
 
+    void HandleEnemyShield()
+    {
+        isP2ShieldActivated = dataReceived.isEnemyShieldActivated(enemyPlayer);
+        opponent.ActivateShield();
+    }
+
     void HandleThrowGrenade()
     {
         Debug.Log("Throw Grenade");
@@ -196,7 +226,7 @@ public class GameLogic : MonoBehaviour
             Debug.Log("Grenade Hit");
             serverComms.setGrenadeHit(true);
         }
-        else 
+        else
         {
             serverComms.setGrenadeHit(false);
         }
@@ -233,14 +263,14 @@ public class GameLogic : MonoBehaviour
         return enemyVisible;
     }
 
-    public void DealGrenadeDamageP2()
-    {
-        if (opponent.GetGrenadeCount() > 0 && opponent.enemyHealth.getHealth() > 0)
-        {
-            enemyGrenadeThrower.ThrowGrenade();
-            // grenadeThrower.ThrowGrenade();
-            Invoke("GrenadeDamageP2", 2.5f);
-            opponent.GrenadeThrown();
-        }
-    }
+    // public void DealGrenadeDamageP2()
+    // {
+    //     if (opponent.GetGrenadeCount() > 0 && opponent.enemyHealth.getHealth() > 0)
+    //     {
+    //         enemyGrenadeThrower.ThrowGrenade();
+    //         // grenadeThrower.ThrowGrenade();
+    //         Invoke("GrenadeDamageP2", 2.5f);
+    //         opponent.GrenadeThrown();
+    //     }
+    // }
 }
