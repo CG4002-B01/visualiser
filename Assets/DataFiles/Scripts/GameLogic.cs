@@ -45,24 +45,11 @@ public class GameLogic : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        // Used for both integration and app only demo
         UpdateHUDTexts();
-        // For integration
-        // UpdateServer();
         UpdateHealth();
         UpdateShield();
         UpdateActions();
     }
-
-    // Integration Functions
-    // void UpdateServer()
-    // {
-    //     if (serverComms.hasGrenadeCheck() && enemyVisible)
-    //     {
-    //         serverComms.setGrenadeHit(true);
-    //         serverComms.setGrenadeCheck(false);
-    //     }
-    // }
 
     void UpdateHUDTexts()
     {
@@ -133,9 +120,16 @@ public class GameLogic : MonoBehaviour
                 if (dataReceived.getOwnId(connectedPlayer) != ownPacketId)
                 {
                     ownPacketId = dataReceived.getOwnId(connectedPlayer);
-                    // Process Actions
+                    // Process Own Actions
                     string ownAction = dataReceived.getOwnAction(connectedPlayer);
                     ProcessActions(ownAction, 2);
+                }
+                if (dataReceived.getEnemyId(enemyPlayer) != enemyPacketId)
+                {
+                    enemyPacketId = dataReceived.getEnemyId(enemyPlayer);
+                    // Process Enemy Actions
+                    string enemyAction = dataReceived.getEnemyAction(enemyPlayer);
+                    ProcessActions(enemyAction, 1);
                 }
                 break;
         }
@@ -147,7 +141,10 @@ public class GameLogic : MonoBehaviour
         {
             case "shoot":
                 // For P1
-                HandlePlayerShoots();
+                if (caller == connectedPlayer)
+                {
+                    HandlePlayerShoots();
+                }
                 break;
             case "reload":
                 // For P1
@@ -160,7 +157,6 @@ public class GameLogic : MonoBehaviour
                 }
                 else
                 {
-                    Debug.Log("Handling Enemy Shield");
                     HandleEnemyShield();
                 }
                 break;
@@ -168,7 +164,7 @@ public class GameLogic : MonoBehaviour
                 // Receive Damage from getting grenaded
                 if (caller == connectedPlayer)
                 {
-                    PlayerReceiveDamage();
+                    PlayerReceiveGrenadeDamage();
                 }
                 break;
             case "grenade_miss":
@@ -193,7 +189,6 @@ public class GameLogic : MonoBehaviour
     void HandlePlayerShoots()
     {
         ammoFirer.bulletAnimation();
-        // Damage Screen for enemy
     }
 
     void HandlePlayerReload()
@@ -234,21 +229,20 @@ public class GameLogic : MonoBehaviour
 
     void PlayerReceiveDamage()
     {
+        Debug.Log("Hit by bullet");
+        player.ReceiveDamage();
+    }
+
+    void PlayerReceiveGrenadeDamage()
+    {
         Debug.Log("Hit by Grenade");
+        enemyGrenadeThrower.ThrowGrenade();
         player.ReceiveDamage();
     }
 
     public void showEnemyHealthBar()
     {
         enemyHealthbarCanvas.SetActive(true);
-        // if (opponent.GetHasShield())
-        // {
-        //     enemyShield.SetActive(true);
-        // }
-        // else
-        // {
-        //     enemyShield.SetActive(false);
-        // }
         enemyVisible = true;
     }
 
@@ -265,12 +259,12 @@ public class GameLogic : MonoBehaviour
 
     // public void DealGrenadeDamageP2()
     // {
-    //     if (opponent.GetGrenadeCount() > 0 && opponent.enemyHealth.getHealth() > 0)
-    //     {
-    //         enemyGrenadeThrower.ThrowGrenade();
-    //         // grenadeThrower.ThrowGrenade();
-    //         Invoke("GrenadeDamageP2", 2.5f);
-    //         opponent.GrenadeThrown();
-    //     }
+        // if (opponent.GetGrenadeCount() > 0 && opponent.enemyHealth.getHealth() > 0)
+        // {
+        //     enemyGrenadeThrower.ThrowGrenade();
+        //     // grenadeThrower.ThrowGrenade();
+        //     Invoke("GrenadeDamageP2", 2.5f);
+        //     opponent.GrenadeThrown();
+        // }
     // }
 }
