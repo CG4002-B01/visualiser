@@ -8,13 +8,13 @@ public class ChangeScene : MonoBehaviour
     public void LoadGameplaySceneP1()
     {
         GlobalStates.SetPlayerNo(1);
-        SceneManager.LoadScene("GameplayScene");
+        SceneManager.LoadScene("AR Starter Medium");
     }
 
     public void LoadGameplaySceneP2()
     {
         GlobalStates.SetPlayerNo(2);
-        SceneManager.LoadScene("GameplayScene");
+        SceneManager.LoadScene("AR Starter Medium");
     }
 
     public void ExitApp()

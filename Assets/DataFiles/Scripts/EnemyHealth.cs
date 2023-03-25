@@ -9,12 +9,10 @@ public class EnemyHealth : MonoBehaviour
     [SerializeField] Gradient gradient;
     [SerializeField] Image fill;
     float health, maxHealth;
-    void Update()
+
+    void Start()
     {
-        if (health > maxHealth)
-        {
-            health = maxHealth;
-        }
+        maxHealth = 100;
     }
 
     public float getHealth() 

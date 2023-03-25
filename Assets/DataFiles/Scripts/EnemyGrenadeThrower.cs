@@ -6,6 +6,7 @@ public class EnemyGrenadeThrower : MonoBehaviour
 {
     public float throwForce = 40f;
     public GameObject grenadePrefab; 
+    public GameObject enemyGrenadeLaunchPoint;
 
     // Start is called before the first frame update
     void Start()
@@ -21,9 +22,9 @@ public class EnemyGrenadeThrower : MonoBehaviour
 
     public void ThrowGrenade()
     {
-        GameObject grenade = Instantiate(grenadePrefab, transform.position, transform.rotation);
+        GameObject grenade = Instantiate(grenadePrefab, enemyGrenadeLaunchPoint.transform.position, enemyGrenadeLaunchPoint.transform.rotation);
         Rigidbody rb = grenade.GetComponent<Rigidbody>();
-        rb.AddForce(transform.forward * throwForce, ForceMode.VelocityChange);
+        rb.AddForce(enemyGrenadeLaunchPoint.transform.forward * throwForce, ForceMode.VelocityChange);
         // rb.AddForce(playerPOV.transform.up * throwForce, ForceMode.VelocityChange);
     }
 }

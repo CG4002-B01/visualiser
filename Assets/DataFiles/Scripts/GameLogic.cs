@@ -10,6 +10,7 @@ public class GameLogic : MonoBehaviour
     const int ShieldCapacity = 3;
     public GameObject enemyShield;
     public GameObject enemyHealthbarCanvas;
+    public GameObject enemyShieldHealthBar;
     public Player player;
     public Opponent opponent;
     public HUDText hudTexts;
@@ -22,16 +23,19 @@ public class GameLogic : MonoBehaviour
     int connectedPlayer = 1; //For testing only
     int enemyPlayer;
     bool enemyVisible;
-    int p1packetId;
-    int p2packetId;
+    int ownPacketId;
+    int enemyPacketId;
     int isP1ShieldActivated;
+    int isP2ShieldActivated;
 
     // Start is called before the first frame update
     void Start()
     {
+        enemyShieldHealthBar.SetActive(false);
+        enemyShield.SetActive(false);
         // Used with integration
-        p1packetId = 0;
-        p2packetId = 0;
+        ownPacketId = 0;
+        enemyPacketId = 0;
         isP1ShieldActivated = 0;
         enemyPlayer = (connectedPlayer == 1) ? 2 : 1;
         // Connect on scene Change
@@ -41,24 +45,11 @@ public class GameLogic : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        // Used for both integration and app only demo
         UpdateHUDTexts();
-        // For integration
-        // UpdateServer();
         UpdateHealth();
         UpdateShield();
         UpdateActions();
     }
-
-    // Integration Functions
-    // void UpdateServer()
-    // {
-    //     if (serverComms.hasGrenadeCheck() && enemyVisible)
-    //     {
-    //         serverComms.setGrenadeHit(true);
-    //         serverComms.setGrenadeCheck(false);
-    //     }
-    // }
 
     void UpdateHUDTexts()
     {
@@ -75,9 +66,9 @@ public class GameLogic : MonoBehaviour
         float playerShieldHealth = (float)dataReceived.getOwnShieldHealth(connectedPlayer);
         float enemyShieldHealth = (float)dataReceived.getEnemyShieldHealth(enemyPlayer);
         player.SetOwnHealth((float)dataReceived.getOwnHealth(connectedPlayer) + playerShieldHealth);
-        opponent.SetOpponentHealth((float)dataReceived.getEnemyHealth(enemyPlayer) + enemyShieldHealth);
+        opponent.SetOpponentHealth((float)dataReceived.getEnemyHealth(enemyPlayer));
+        opponent.SetOppponentShieldHealth(enemyShieldHealth);
         player.SetOwnMaxHealth(100 + playerShieldHealth);
-        // Set 1 for opponent too
     }
 
     void UpdateShield()
@@ -94,6 +85,13 @@ public class GameLogic : MonoBehaviour
                 }
                 break;
             case 2:
+                if (isP2ShieldActivated != dataReceived.isEnemyShieldActivated(enemyPlayer))
+                {
+                    if (dataReceived.isEnemyShieldActivated(connectedPlayer) == 0)
+                    {
+                        opponent.DeactivateShield();
+                    }
+                }
                 break;
         }
     }
@@ -103,15 +101,36 @@ public class GameLogic : MonoBehaviour
         switch (connectedPlayer)
         {
             case 1:
-                if (dataReceived.getOwnId(connectedPlayer) != p1packetId)
+                if (dataReceived.getOwnId(connectedPlayer) != ownPacketId)
                 {
-                    p1packetId = dataReceived.getOwnId(connectedPlayer);
-                    // Process Actions
-                    string p1Action = dataReceived.getOwnAction(connectedPlayer);
-                    ProcessActions(p1Action, 1);
+                    ownPacketId = dataReceived.getOwnId(connectedPlayer);
+                    // Process Own Actions
+                    string ownAction = dataReceived.getOwnAction(connectedPlayer);
+                    ProcessActions(ownAction, 1);
+                }
+                if (dataReceived.getEnemyId(enemyPlayer) != enemyPacketId)
+                {
+                    enemyPacketId = dataReceived.getEnemyId(enemyPlayer);
+                    // Process Enemy Actions
+                    string enemyAction = dataReceived.getEnemyAction(enemyPlayer);
+                    ProcessActions(enemyAction, 2);
                 }
                 break;
             case 2:
+                if (dataReceived.getOwnId(connectedPlayer) != ownPacketId)
+                {
+                    ownPacketId = dataReceived.getOwnId(connectedPlayer);
+                    // Process Own Actions
+                    string ownAction = dataReceived.getOwnAction(connectedPlayer);
+                    ProcessActions(ownAction, 2);
+                }
+                if (dataReceived.getEnemyId(enemyPlayer) != enemyPacketId)
+                {
+                    enemyPacketId = dataReceived.getEnemyId(enemyPlayer);
+                    // Process Enemy Actions
+                    string enemyAction = dataReceived.getEnemyAction(enemyPlayer);
+                    ProcessActions(enemyAction, 1);
+                }
                 break;
         }
     }
@@ -122,7 +141,10 @@ public class GameLogic : MonoBehaviour
         {
             case "shoot":
                 // For P1
-                HandlePlayerShoots();
+                if (caller == connectedPlayer)
+                {
+                    HandlePlayerShoots();
+                }
                 break;
             case "reload":
                 // For P1
@@ -135,27 +157,30 @@ public class GameLogic : MonoBehaviour
                 }
                 else
                 {
-                    // HandlePlayerShield(enemyShieldHealth);
-                    // Or should this be handle enemy shield. 
+                    HandleEnemyShield();
                 }
                 break;
-            case "throw":
-                // Check if player is visible, update engine result
-                // Show grenade animation regardless for thrower
-                HandleThrowGrenade();
+            case "grenade_hit":
+                // Receive Damage from getting grenaded
+                if (caller == connectedPlayer)
+                {
+                    PlayerReceiveGrenadeDamage();
+                }
+                break;
+            case "grenade_miss":
                 break;
             case "hit":
                 // Receive Damage for getting shot
-                if(caller == connectedPlayer)
+                if (caller == connectedPlayer)
                 {
                     PlayerReceiveDamage();
                 }
                 break;
             case "grenade":
-                // Receive Damage from getting grenaded
+                // Check if player is visible, update engine result
                 if (caller == connectedPlayer)
                 {
-                    PlayerReceiveDamage();
+                    HandleThrowGrenade();
                 }
                 break;
         }
@@ -164,7 +189,6 @@ public class GameLogic : MonoBehaviour
     void HandlePlayerShoots()
     {
         ammoFirer.bulletAnimation();
-        // Damage Screen for enemy
     }
 
     void HandlePlayerReload()
@@ -178,11 +202,17 @@ public class GameLogic : MonoBehaviour
         player.ActivateShield();
     }
 
+    void HandleEnemyShield()
+    {
+        isP2ShieldActivated = dataReceived.isEnemyShieldActivated(enemyPlayer);
+        opponent.ActivateShield();
+    }
+
     void HandleThrowGrenade()
     {
-        Debug.Log("Throw Grenade");
         // Animation
         grenadeThrower.ThrowGrenade();
+        serverComms.setGrenadeCheck(true);
 
         // Return enemy visibility to game engine
         if (enemyVisible)
@@ -190,24 +220,28 @@ public class GameLogic : MonoBehaviour
             Debug.Log("Grenade Hit");
             serverComms.setGrenadeHit(true);
         }
+        else
+        {
+            serverComms.setGrenadeHit(false);
+        }
     }
 
     void PlayerReceiveDamage()
     {
+        Debug.Log("Hit by bullet");
+        player.ReceiveDamage();
+    }
+
+    void PlayerReceiveGrenadeDamage()
+    {
+        Debug.Log("Hit by Grenade");
+        enemyGrenadeThrower.ThrowGrenade();
         player.ReceiveDamage();
     }
 
     public void showEnemyHealthBar()
     {
         enemyHealthbarCanvas.SetActive(true);
-        if (opponent.GetHasShield())
-        {
-            enemyShield.SetActive(true);
-        }
-        else
-        {
-            enemyShield.SetActive(false);
-        }
         enemyVisible = true;
     }
 
@@ -222,14 +256,14 @@ public class GameLogic : MonoBehaviour
         return enemyVisible;
     }
 
-    public void DealGrenadeDamageP2()
-    {
-        if (opponent.GetGrenadeCount() > 0 && opponent.enemyHealth.getHealth() > 0)
-        {
-            enemyGrenadeThrower.ThrowGrenade();
-            // grenadeThrower.ThrowGrenade();
-            Invoke("GrenadeDamageP2", 2.5f);
-            opponent.GrenadeThrown();
-        }
-    }
+    // public void DealGrenadeDamageP2()
+    // {
+        // if (opponent.GetGrenadeCount() > 0 && opponent.enemyHealth.getHealth() > 0)
+        // {
+        //     enemyGrenadeThrower.ThrowGrenade();
+        //     // grenadeThrower.ThrowGrenade();
+        //     Invoke("GrenadeDamageP2", 2.5f);
+        //     opponent.GrenadeThrown();
+        // }
+    // }
 }

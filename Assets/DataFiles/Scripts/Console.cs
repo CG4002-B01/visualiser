@@ -16,7 +16,9 @@ public class Console : MonoBehaviour
     string stuHost = "stu.comp.nus.edu.sg";
     string stuUser = "xuanlc13";
     string stuPass = "inEAdtoX618rBgfr15qE";
-    string ultra96Host = "192.168.95.224";
+    // string ultra96Host = "192.168.95.224";
+    // Backup Board
+    string ultra96Host = "192.168.95.245";
     string socketHost;
     int socketPort;
     Socket socket;
@@ -38,24 +40,19 @@ public class Console : MonoBehaviour
     bool newState = false;
 
     // To see if throw action received 
-    // bool grenadeCheck = false;
+    bool grenadeCheck = false;
 
     // Opponent in view and grenade can hit
     bool grenadeHit = false;
 
     void Start()
     {
-        enemyPlayer = player == 1 ? 2 : 1;
+        enemyPlayer = (player == 1) ? 2 : 1;
     }
 
     void Update()
     {
         consoleText.text = textToUpdate;
-    }
-
-    void TextDisappear()
-    {
-        consoleText.text = "";
     }
 
     public string getGameState()
@@ -78,48 +75,43 @@ public class Console : MonoBehaviour
     //     return grenadeCheck;
     // }
 
-    // public void completeGrenadeCheck()
-    // {
-    //     grenadeCheck = false;
-    // }
+    public void setGrenadeCheck(bool status)
+    {
+        grenadeCheck = status;
+    }
 
     public void setGrenadeHit(bool status)
     {
         grenadeHit = status;
     }
 
-    // public void setGrenadeCheck(bool status)
-    // {
-    //     grenadeCheck = status;
-    // }
-
     public void connect()
     {
         // Tunnel to Ultra96
-        stuClient = new SshClient(stuHost, stuUser, stuPass);
-        stuClient.Connect();
+        // stuClient = new SshClient(stuHost, stuUser, stuPass);
+        // stuClient.Connect();
 
-        port = new ForwardedPortLocal("127.0.0.1", ultra96Host, 5004);
-        stuClient.AddForwardedPort(port);
-        port.Start();
-        Debug.Log(port.BoundPort);
+        // port = new ForwardedPortLocal("127.0.0.1", ultra96Host, 5004);
+        // stuClient.AddForwardedPort(port);
+        // port.Start();
+        // Debug.Log(port.BoundPort);
 
         // For testing
-        // IPAddress[] IPs = Dns.GetHostAddresses("localhost");
-        // string localhostName = "127.0.0.1"; //For testing on Jon's laptop
-        // System.Int32 localhostPortNo = 5004;
+        IPAddress[] IPs = Dns.GetHostAddresses("localhost");
+        string localhostName = "127.0.0.1"; //For testing on Jon's laptop
+        System.Int32 localhostPortNo = 5004;
 
-        int socketPort = Convert.ToInt32(port.BoundPort);
+        // int socketPort = Convert.ToInt32(port.BoundPort);
         socket = new Socket(SocketType.Stream, ProtocolType.Tcp);
-        // try
-        // {
-        //     // socket.Connect(localhostName, localhostPortNo); // Testing by connecting to local host
-        // }
-        // catch (Exception e)
-        // {
-        //     Debug.Log(e);
-        // }
-        socket.Connect(port.BoundHost, socketPort); // For connecting to Ultra96
+        try
+        {
+            socket.Connect(localhostName, localhostPortNo); // Testing by connecting to local host
+        }
+        catch (Exception e)
+        {
+            Debug.Log(e);
+        }
+        // socket.Connect(port.BoundHost, socketPort); // For connecting to Ultra96
 
         try
         {
@@ -149,7 +141,6 @@ public class Console : MonoBehaviour
         Debug.Log(response);
 
         textToUpdate = response;
-        // Invoke("TextDisappear", 0.5f);
 
         Debug.Log("connected");
 
@@ -170,13 +161,6 @@ public class Console : MonoBehaviour
             {
                 Debug.Log(e);
             }
-
-
-            // For printing json received on screen directly
-            // textToUpdate = response;
-
-            // For checking if throw action
-            // handleMsg(response);
         }
     }
 
@@ -253,13 +237,18 @@ public class Console : MonoBehaviour
         {
             if (grenadeHit)
             {
-                // Old Response
-                var response = "{\"action\": \"grenade\", \"player\": " + enemyPlayer + "}";
-                // New Response
-                // var response = "{\"type\": \"action\", \"data\": \"grenade\"}";
-                sendMsg(response);
+                Debug.Log("Grenade Hit message sent");
+                var posResponse = "{\"action\": \"grenade_hit\", \"player\": " + enemyPlayer + "}";
+                sendMsg(posResponse);
                 grenadeHit = false;
             }
+            else if (!grenadeHit && grenadeCheck) 
+            {
+                Debug.Log("Grenade Miss message sent");
+                var negResponse = "{\"action\": \"grenade_miss\", \"player\": " + enemyPlayer + "}";
+                sendMsg(negResponse);
+            }
+            grenadeCheck = false;
         }
     }
 
