@@ -210,7 +210,6 @@ public class GameLogic : MonoBehaviour
 
     void HandleThrowGrenade()
     {
-        Debug.Log("Throw Grenade");
         // Animation
         grenadeThrower.ThrowGrenade();
         serverComms.setGrenadeCheck(true);

@@ -47,17 +47,12 @@ public class Console : MonoBehaviour
 
     void Start()
     {
-        enemyPlayer = player == 1 ? 2 : 1;
+        enemyPlayer = (player == 1) ? 2 : 1;
     }
 
     void Update()
     {
         consoleText.text = textToUpdate;
-    }
-
-    void TextDisappear()
-    {
-        consoleText.text = "";
     }
 
     public string getGameState()
@@ -89,11 +84,6 @@ public class Console : MonoBehaviour
     {
         grenadeHit = status;
     }
-
-    // public void setGrenadeCheck(bool status)
-    // {
-    //     grenadeCheck = status;
-    // }
 
     public void connect()
     {
@@ -151,7 +141,6 @@ public class Console : MonoBehaviour
         Debug.Log(response);
 
         textToUpdate = response;
-        // Invoke("TextDisappear", 0.5f);
 
         Debug.Log("connected");
 
@@ -172,13 +161,6 @@ public class Console : MonoBehaviour
             {
                 Debug.Log(e);
             }
-
-
-            // For printing json received on screen directly
-            // textToUpdate = response;
-
-            // For checking if throw action
-            // handleMsg(response);
         }
     }
 
@@ -253,14 +235,16 @@ public class Console : MonoBehaviour
     {
         while (true)
         {
-            if (grenadeHit && grenadeCheck)
+            if (grenadeHit)
             {
+                Debug.Log("Grenade Hit message sent");
                 var posResponse = "{\"action\": \"grenade_hit\", \"player\": " + enemyPlayer + "}";
                 sendMsg(posResponse);
                 grenadeHit = false;
             }
             else if (!grenadeHit && grenadeCheck) 
             {
+                Debug.Log("Grenade Miss message sent");
                 var negResponse = "{\"action\": \"grenade_miss\", \"player\": " + enemyPlayer + "}";
                 sendMsg(negResponse);
             }
