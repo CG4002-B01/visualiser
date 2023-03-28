@@ -19,8 +19,8 @@ public class GameLogic : MonoBehaviour
     public RayGun ammoFirer;
     public Console serverComms;
     public JSONReader dataReceived;
-    // int connectedPlayer = GlobalStates.GetPlayerNo(); 
-    int connectedPlayer = 1; //For testing only
+    int connectedPlayer = GlobalStates.GetPlayerNo(); 
+    // int connectedPlayer = 1; //For testing only
     int enemyPlayer;
     bool enemyVisible;
     int ownPacketId;

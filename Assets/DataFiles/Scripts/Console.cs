@@ -31,8 +31,8 @@ public class Console : MonoBehaviour
     public TMP_Text consoleText;
     string textToUpdate;
 
-    // int player = GlobalStates.GetPlayerNo(); 
-    int player = 1; // TODO: set on connect
+    int player = GlobalStates.GetPlayerNo(); 
+    // int player = 1; // TODO: set on connect
 
     int enemyPlayer;
 
