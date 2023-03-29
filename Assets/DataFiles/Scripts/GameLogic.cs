@@ -212,17 +212,18 @@ public class GameLogic : MonoBehaviour
     {
         // Animation
         grenadeThrower.ThrowGrenade();
-        serverComms.setGrenadeCheck(true);
+        // serverComms.setGrenadeCheck(true);
 
         // Return enemy visibility to game engine
         if (enemyVisible)
         {
             Debug.Log("Grenade Hit");
-            serverComms.setGrenadeHit(true);
+            serverComms.setGrenadeHit(1);
         }
         else
         {
-            serverComms.setGrenadeHit(false);
+            Debug.Log("Grenade Miss");
+            serverComms.setGrenadeHit(2);
         }
     }
 

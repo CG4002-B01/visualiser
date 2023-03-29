@@ -39,14 +39,15 @@ public class Console : MonoBehaviour
     string recvState = "";
     bool newState = false;
 
-    // To see if throw action received 
-    bool grenadeCheck = false;
-
     // Opponent in view and grenade can hit
-    bool grenadeHit = false;
+    // 0 = no throw command 
+    // 1 = hit
+    // 2 = miss
+    int grenadeHitStatus;
 
     void Start()
     {
+        grenadeHitStatus = 0;
         enemyPlayer = (player == 1) ? 2 : 1;
     }
 
@@ -77,12 +78,14 @@ public class Console : MonoBehaviour
 
     public void setGrenadeCheck(bool status)
     {
-        grenadeCheck = status;
+        Debug.Log("Set grenade Check function called");
+        // grenadeCheck = status;
+        // Debug.Log(grenadeCheck);
     }
 
-    public void setGrenadeHit(bool status)
+    public void setGrenadeHit(int status)
     {
-        grenadeHit = status;
+        grenadeHitStatus = status;
     }
 
     public void connect()
@@ -235,20 +238,21 @@ public class Console : MonoBehaviour
     {
         while (true)
         {
-            if (grenadeHit)
+            if (grenadeHitStatus == 1)
             {
                 Debug.Log("Grenade Hit message sent");
                 var posResponse = "{\"action\": \"grenade_hit\", \"player\": " + enemyPlayer + "}";
                 sendMsg(posResponse);
-                grenadeHit = false;
+                grenadeHitStatus = 0;
             }
-            else if (!grenadeHit && grenadeCheck) 
+            else if (grenadeHitStatus == 2) 
             {
                 Debug.Log("Grenade Miss message sent");
                 var negResponse = "{\"action\": \"grenade_miss\", \"player\": " + enemyPlayer + "}";
                 sendMsg(negResponse);
+                grenadeHitStatus = 0;
             }
-            grenadeCheck = false;
+            // grenadeCheck = false;
         }
     }
 
