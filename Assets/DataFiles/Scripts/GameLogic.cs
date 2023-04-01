@@ -19,8 +19,8 @@ public class GameLogic : MonoBehaviour
     public RayGun ammoFirer;
     public Console serverComms;
     public JSONReader dataReceived;
-    // int connectedPlayer = GlobalStates.GetPlayerNo(); 
-    int connectedPlayer = 1; //For testing only
+    int connectedPlayer = GlobalStates.GetPlayerNo(); 
+    // int connectedPlayer = 1; //For testing only
     int enemyPlayer;
     bool enemyVisible;
     int ownPacketId;
@@ -148,7 +148,11 @@ public class GameLogic : MonoBehaviour
                 break;
             case "reload":
                 // For P1
-                HandlePlayerReload();
+                if (caller == connectedPlayer)
+                {
+                    HandlePlayerReload();
+                }
+                // HandlePlayerReload();
                 break;
             case "shield":
                 if (caller == connectedPlayer)
@@ -176,7 +180,7 @@ public class GameLogic : MonoBehaviour
                     PlayerReceiveDamage();
                 }
                 break;
-            case "grenade":
+            case "throw":
                 // Check if player is visible, update engine result
                 if (caller == connectedPlayer)
                 {
@@ -212,17 +216,18 @@ public class GameLogic : MonoBehaviour
     {
         // Animation
         grenadeThrower.ThrowGrenade();
-        serverComms.setGrenadeCheck(true);
+        // serverComms.setGrenadeCheck(true);
 
         // Return enemy visibility to game engine
         if (enemyVisible)
         {
             Debug.Log("Grenade Hit");
-            serverComms.setGrenadeHit(true);
+            serverComms.setGrenadeHit(1);
         }
         else
         {
-            serverComms.setGrenadeHit(false);
+            Debug.Log("Grenade Miss");
+            serverComms.setGrenadeHit(2);
         }
     }
 

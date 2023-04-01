@@ -8,6 +8,7 @@ public class ARStarter : MonoBehaviour
 {
     void Start()
     {
+        // LoadARScene();
         #if UNITY_EDITOR
             LoadARScene();
         #else
