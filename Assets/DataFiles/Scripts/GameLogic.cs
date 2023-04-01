@@ -148,7 +148,11 @@ public class GameLogic : MonoBehaviour
                 break;
             case "reload":
                 // For P1
-                HandlePlayerReload();
+                if (caller == connectedPlayer)
+                {
+                    HandlePlayerReload();
+                }
+                // HandlePlayerReload();
                 break;
             case "shield":
                 if (caller == connectedPlayer)
@@ -176,7 +180,7 @@ public class GameLogic : MonoBehaviour
                     PlayerReceiveDamage();
                 }
                 break;
-            case "grenade":
+            case "throw":
                 // Check if player is visible, update engine result
                 if (caller == connectedPlayer)
                 {

@@ -31,7 +31,7 @@ public class Console : MonoBehaviour
     public TMP_Text consoleText;
     string textToUpdate;
 
-    int player = GlobalStates.GetPlayerNo(); 
+    int player = GlobalStates.GetPlayerNo();
     // int player = 1; // TODO: set on connect
 
     int enemyPlayer;
@@ -91,40 +91,40 @@ public class Console : MonoBehaviour
     public void connect()
     {
         // Tunnel to Ultra96
-        // stuClient = new SshClient(stuHost, stuUser, stuPass);
-        // stuClient.Connect();
+        stuClient = new SshClient(stuHost, stuUser, stuPass);
+        stuClient.Connect();
 
-        // port = new ForwardedPortLocal("127.0.0.1", ultra96Host, 5004);
-        // stuClient.AddForwardedPort(port);
-        // port.Start();
-        // Debug.Log(port.BoundPort);
+        port = new ForwardedPortLocal("127.0.0.1", ultra96Host, 5004);
+        stuClient.AddForwardedPort(port);
+        port.Start();
+        Debug.Log(port.BoundPort);
 
         // For testing
-        IPAddress[] IPs = Dns.GetHostAddresses("localhost");
-        string localhostName = "127.0.0.1"; //For testing on Jon's laptop
-        System.Int32 localhostPortNo = 5004;
+        // IPAddress[] IPs = Dns.GetHostAddresses("localhost");
+        // string localhostName = "127.0.0.1"; //For testing on Jon's laptop
+        // System.Int32 localhostPortNo = 5004;
 
-        // int socketPort = Convert.ToInt32(port.BoundPort);
+        int socketPort = Convert.ToInt32(port.BoundPort);
         socket = new Socket(SocketType.Stream, ProtocolType.Tcp);
-        try
-        {
-            socket.Connect(localhostName, localhostPortNo); // Testing by connecting to local host
-        }
-        catch (Exception e)
-        {
-            Debug.Log(e);
-        }
-        // socket.Connect(port.BoundHost, socketPort); // For connecting to Ultra96
+        // try
+        // {
+        //     socket.Connect(localhostName, localhostPortNo); // Testing by connecting to local host
+        // }
+        // catch (Exception e)
+        // {
+        //     Debug.Log(e);
+        // }
+        socket.Connect(port.BoundHost, socketPort); // For connecting to Ultra96
 
         try
         {
+            // sendThread = new Thread(new ThreadStart(startSend));
+            // sendThread.IsBackground = true;
+            // sendThread.Start();
+
             recvThread = new Thread(new ThreadStart(startRecv));
             recvThread.IsBackground = true;
             recvThread.Start();
-
-            sendThread = new Thread(new ThreadStart(startSend));
-            sendThread.IsBackground = true;
-            sendThread.Start();
         }
         catch (Exception e)
         {
@@ -159,6 +159,23 @@ public class Console : MonoBehaviour
                 string response = receiveMsg();
                 Debug.Log("received: " + response);
                 jsonReader.setTextJSON(response);
+                Thread.Sleep(500);
+                if (grenadeHitStatus == 1)
+                {
+                    Debug.Log("Grenade Hit message sent");
+                    // textToUpdate = "Grenade Hit Message sent";
+                    var posResponse = "{\"action\": \"grenade_hit\", \"player\": " + enemyPlayer + "}";
+                    sendMsg(posResponse);
+                    grenadeHitStatus = 0;
+                }
+                else if (grenadeHitStatus == 2)
+                {
+                    Debug.Log("Grenade Miss message sent");
+                    // textToUpdate = "Grenade Hit Message sent";
+                    var negResponse = "{\"action\": \"grenade_miss\", \"player\": " + enemyPlayer + "}";
+                    sendMsg(negResponse);
+                    grenadeHitStatus = 0;
+                }
             }
             catch (Exception e)
             {
@@ -238,16 +255,19 @@ public class Console : MonoBehaviour
     {
         while (true)
         {
+            textToUpdate = "thread running";
             if (grenadeHitStatus == 1)
             {
                 Debug.Log("Grenade Hit message sent");
+                // textToUpdate = "Grenade Hit Message sent";
                 var posResponse = "{\"action\": \"grenade_hit\", \"player\": " + enemyPlayer + "}";
                 sendMsg(posResponse);
                 grenadeHitStatus = 0;
             }
-            else if (grenadeHitStatus == 2) 
+            else if (grenadeHitStatus == 2)
             {
                 Debug.Log("Grenade Miss message sent");
+                // textToUpdate = "Grenade Hit Message sent";
                 var negResponse = "{\"action\": \"grenade_miss\", \"player\": " + enemyPlayer + "}";
                 sendMsg(negResponse);
                 grenadeHitStatus = 0;
