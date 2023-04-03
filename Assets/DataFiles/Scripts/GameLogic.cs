@@ -19,6 +19,7 @@ public class GameLogic : MonoBehaviour
     public RayGun ammoFirer;
     public Console serverComms;
     public JSONReader dataReceived;
+    public ChangeScene sceneManager;
     int connectedPlayer = GlobalStates.GetPlayerNo(); 
     // int connectedPlayer = 1; //For testing only
     int enemyPlayer;
@@ -185,6 +186,12 @@ public class GameLogic : MonoBehaviour
                 if (caller == connectedPlayer)
                 {
                     HandleThrowGrenade();
+                }
+                break;
+            case "logout":
+                if (caller == connectedPlayer)
+                {
+                    sceneManager.LoadMenuScene();
                 }
                 break;
         }

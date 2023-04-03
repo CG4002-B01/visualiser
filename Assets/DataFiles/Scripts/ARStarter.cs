@@ -8,12 +8,12 @@ public class ARStarter : MonoBehaviour
 {
     void Start()
     {
-        // LoadARScene();
-        #if UNITY_EDITOR
-            LoadARScene();
-        #else
-            StartCoroutine(StartXR());
-        #endif
+        LoadARScene();
+        // #if UNITY_EDITOR
+        //     LoadARScene();
+        // #else
+        //     StartCoroutine(StartXR());
+        // #endif
     }
 
     public IEnumerator StartXR()

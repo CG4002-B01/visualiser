@@ -17,6 +17,12 @@ public class ChangeScene : MonoBehaviour
         SceneManager.LoadScene("AR Starter Medium");
     }
 
+    public void LoadMenuScene()
+    {
+        GlobalStates.SetPlayerNo(0);
+        SceneManager.LoadScene("MenuScene");
+    }
+
     public void ExitApp()
     {
         Debug.Log("Exit Button works!");
